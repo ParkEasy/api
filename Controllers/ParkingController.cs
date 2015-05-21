@@ -6,11 +6,11 @@ using Microsoft.AspNet.Mvc;
 
 namespace ParkEasyAPI.Controllers
 {
-    [Route("[controller]")]
     public class ParkingController : Controller
     {
-        // GET /parking/5
-        [HttpGet("closest/{lat}/{lon}")]
+        // GET /closest
+        [Route("closest")]
+        [HttpGet]
         public IEnumerable<float> Closest(float lat, float lon)
         {
             return new float[] { lat, lon };
