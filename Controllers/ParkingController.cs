@@ -7,7 +7,7 @@ using Microsoft.AspNet.Mvc;
 namespace ParkEasyAPI.Controllers
 {
     [Route("v1/[controller]")]
-    public class ValuesController : Controller
+    public class ParkingController : Controller
     {
         // GET: v1/values
         [HttpGet]
