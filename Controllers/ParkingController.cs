@@ -11,9 +11,9 @@ namespace ParkEasyAPI.Controllers
     {
         // GET /parking/5
         [HttpGet("closest/{lat}/{lon}")]
-        public IEnumerable<string> Get()
+        public IEnumerable<float> Closest(float lat, float lon)
         {
-            return new string[] { "value1", "value2" };
+            return new float[] { lat, lon };
         }
     }
 }
