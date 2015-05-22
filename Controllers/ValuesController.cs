@@ -6,36 +6,36 @@ using Microsoft.AspNet.Mvc;
 
 namespace ParkEasyAPI.Controllers
 {
-    [Route("v1/[controller]")]
+    [Route("api/[controller]")]
     public class ValuesController : Controller
     {
-        // GET: v1/values
+        // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET v1/values/5
+        // GET api/values/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
 
-        // POST v1/values
+        // POST api/values
         [HttpPost]
         public void Post([FromBody]string value)
         {
         }
 
-        // PUT v1/values/5
+        // PUT api/values/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody]string value)
         {
         }
 
-        // DELETE v1/values/5
+        // DELETE api/values/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
