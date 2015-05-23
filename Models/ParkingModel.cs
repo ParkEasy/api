@@ -17,5 +17,6 @@ namespace ParkEasyAPI.Models
 		public string RedPointText; // some payment stuff
 		public string SectionFrom;
 		public string SectionTo;
+		public double DistanceToUser;
 	}
 }

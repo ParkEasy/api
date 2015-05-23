@@ -84,6 +84,8 @@ namespace ParkEasyAPI.Controllers
                     coordinateModel.Longitude = machine.geometry.x;
                     model.Coordinate = coordinateModel;
                     
+                    model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                    
                     parkingModels.Add(model);
                 }
             }
@@ -93,14 +95,14 @@ namespace ParkEasyAPI.Controllers
             // filter out all the places that are not within radius distance
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
             {
-                return a.Coordinate.DistanceTo(currentPosition) < radius / 1000;
+                return a.DistanceToUser < radius / 1000;
             }).ToList<ParkingModel>();
             
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
             {
-                double dstA = a.Coordinate.DistanceTo(currentPosition);
-                double dstB = b.Coordinate.DistanceTo(currentPosition);
+                double dstA = a.DistanceToUser;
+                double dstB = b.DistanceToUser;
                 
                 if(dstA > dstB) return 1;
                 else if(dstA < dstB) return -1;
