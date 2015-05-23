@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
+using Newtonsoft.Json;
+using ParkEasyAPI.Models;
 
 namespace ParkEasyAPI.Controllers
 {
@@ -20,7 +20,35 @@ namespace ParkEasyAPI.Controllers
                 return "Error";
             }
             
-            return new float[] { lat, lon, radius, hours };
+            List<ParkingModel> parkingModels = new List<ParkingModel>();
+            
+            // load parking garages
+            using(var client = new System.Net.WebClient()) {
+                var body = client.DownloadString("http://www.stadt-koeln.de/externe-dienste/open-data/parking.php");
+                dynamic json = JsonConvert.DeserializeObject(body);
+                
+                // parse parking garages into our parking model
+                foreach(dynamic garage in json.features) {
+                    
+                    ParkingModel model = new ParkingModel();
+                    
+                    // parse garage data
+                    model.Name = garage.attributes.PARKHAUS;
+                    model.ID = garage.attributes.IDENTIFIER;
+                    model.Capacity = garage.attributes.KAPAZITAET;
+                    model.Trend = garage.attributes.TENDENZ;
+                    
+                    // parse coordinates
+                    CoordinateModel coordinateModel = new CoordinateModel();
+                    coordinateModel.Latitude = garage.geometry.y;
+                    coordinateModel.Longitude = garage.geometry.x;
+                    model.Coordinate = coordinateModel;
+                    
+                    parkingModels.Add(model);
+                }
+            }
+            
+            return parkingModels;
         }
     }
 }

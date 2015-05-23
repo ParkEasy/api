@@ -7,7 +7,8 @@
       "Microsoft.AspNet.Server.IIS >= 1.0.0-beta4",
       "Microsoft.AspNet.Server.WebListener >= 1.0.0-beta4",
       "Microsoft.AspNet.StaticFiles >= 1.0.0-beta4",
-      "Kestrel >= 1.0.0-beta4"
+      "Kestrel >= 1.0.0-beta4",
+      "Newtonsoft.Json >= 6.0.8"
     ],
     "DNX,Version=v4.5.1": [],
     "DNXCore,Version=v5.0": []
@@ -3003,9 +3004,9 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/Microsoft.Win32.Registry.dll"
       ]
     },
-    "Newtonsoft.Json/6.0.6": {
+    "Newtonsoft.Json/6.0.8": {
       "serviceable": false,
-      "sha": "w26uZNyCG5VeoKiEOJ4+9/o8koSofLKwHl7WLreIcp0U6r57L7WiRXmjp8MTKFw6dYNZ9AE0lw69WYbIhUsU9Q==",
+      "sha": "nZX7xCBl3PXpxRCxVtVfUXn63gSzrT8aO0VB9Tp24q656IUup9EGE8SGlo0UJ9if48OacJU34ZEtKEGWIdNCzg==",
       "frameworks": {
         "DNX,Version=v4.5.1": {
           "dependencies": {},
@@ -3029,8 +3030,8 @@
         }
       },
       "files": [
-        "Newtonsoft.Json.6.0.6.nupkg",
-        "Newtonsoft.Json.6.0.6.nupkg.sha512",
+        "Newtonsoft.Json.6.0.8.nupkg",
+        "Newtonsoft.Json.6.0.8.nupkg.sha512",
         "Newtonsoft.Json.nuspec",
         "lib/net20/Newtonsoft.Json.dll",
         "lib/net20/Newtonsoft.Json.xml",
