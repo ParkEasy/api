@@ -13,7 +13,7 @@ namespace ParkEasyAPI.Controllers
         // https://github.com/ParkEasy/api/wiki/API-Docs#closest
         [HttpGet]
         [Route("closest")]
-        public dynamic Closest(float lat = -1, float lon = -1, int radius = 5000, int hours = 1, int limit = 3)
+        public dynamic Closest(float lat = -1, float lon = -1, int radius = 5000, int hours = 1)
         {
             // validity check: are lat and long specified?
             if(lat < 0 || lon < 0) 
@@ -89,6 +89,12 @@ namespace ParkEasyAPI.Controllers
             }
             
             Console.WriteLine(parkingModels.Count);
+            
+            // filter out all the places that are not within radius distance
+            parkingModels = parkingModels.Where(delegate(ParkingModel a)
+            {
+                return a.Coordinate.DistanceTo(currentPosition) < radius / 1000;
+            }).ToList<ParkingModel>();
             
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
