@@ -13,13 +13,18 @@ namespace ParkEasyAPI.Controllers
         // https://github.com/ParkEasy/api/wiki/API-Docs#closest
         [HttpGet]
         [Route("closest")]
-        public dynamic Closest(float lat = -1, float lon = -1, int radius = 5000, int hours = 1)
+        public dynamic Closest(float lat = -1, float lon = -1, int radius = 5000, int hours = 1, int limit = 3)
         {
             // validity check: are lat and long specified?
             if(lat < 0 || lon < 0) 
             {
                 return "Error";
             }
+            
+            // create coordinate model form user given parameter
+            CoordinateModel currentPosition = new CoordinateModel();
+            currentPosition.Latitude = lat;
+            currentPosition.Longitude = lon;
             
             List<ParkingModel> parkingModels = new List<ParkingModel>();
             
@@ -70,6 +75,8 @@ namespace ParkEasyAPI.Controllers
                     model.PricePerHour = Convert.ToDouble(machine.attributes.Gebuehr);
                     model.MaximumParkingHours = Convert.ToDouble(machine.attributes.Hoechstparkdauer);
                     model.RedPointText = machine.attributes.Roter_Punkt_Text;
+                    model.SectionFrom = machine.attributes.Abschnitt_Von;
+                    model.SectionTo = machine.attributes.Abschnitt_Bis;
                     
                     // parse coordinates
                     CoordinateModel coordinateModel = new CoordinateModel();
@@ -82,6 +89,17 @@ namespace ParkEasyAPI.Controllers
             }
             
             Console.WriteLine(parkingModels.Count);
+            
+            // sort by closeness to current position
+            parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
+            {
+                double dstA = a.Coordinate.DistanceTo(currentPosition);
+                double dstB = b.Coordinate.DistanceTo(currentPosition);
+                
+                if(dstA > dstB) return 1;
+                else if(dstA < dstB) return -1;
+                else return 0;
+            });
             
             return parkingModels;
         }

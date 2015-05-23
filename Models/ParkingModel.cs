@@ -15,5 +15,7 @@ namespace ParkEasyAPI.Models
 		public double? PricePerHour;
 		public double? MaximumParkingHours;
 		public string RedPointText; // some payment stuff
+		public string SectionFrom;
+		public string SectionTo;
 	}
 }
