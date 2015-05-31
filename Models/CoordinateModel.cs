@@ -7,13 +7,15 @@ namespace ParkEasyAPI.Models
 		public double Latitude;
 		public double Longitude; 
 		
+		// DISTANCE TO
+		// Calculates the euclidian distance between two coordinates in meters
 		public double DistanceTo(CoordinateModel coordinate)
 		{
 			double dst = Math.Sqrt(
-				Math.Pow(coordinate.Latitude - this.Latitude, 2) + 
-				Math.Pow(coordinate.Longitude - this.Longitude, 2)
+				Math.Pow(this.Latitude - coordinate.Latitude, 2) + 
+				Math.Pow(this.Longitude - coordinate.Longitude, 2)
 			);
-			return Math.Abs(dst);
+			return Math.Abs(dst) * 6371 / 1000;
 		}
 	}
 }

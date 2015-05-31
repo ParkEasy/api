@@ -6,26 +6,13 @@ using Newtonsoft.Json;
 using ParkEasyAPI.Models;
 
 namespace ParkEasyAPI.Controllers
-{
+{   
     public class ParkingController : Controller
     {
-        // GET /closest
-        // https://github.com/ParkEasy/api/wiki/API-Docs#closest
-        [HttpGet]
-        [Route("closest")]
-        public dynamic Closest(float lat = -1, float lon = -1, int radius = 5000, int hours = 1)
+        // LOAD DATA
+        // loads data from various data sources
+        private List<ParkingModel> LoadData(CoordinateModel currentPosition)
         {
-            // validity check: are lat and long specified?
-            if(lat < 0 || lon < 0) 
-            {
-                return "Error";
-            }
-            
-            // create coordinate model form user given parameter
-            CoordinateModel currentPosition = new CoordinateModel();
-            currentPosition.Latitude = lat;
-            currentPosition.Longitude = lon;
-            
             List<ParkingModel> parkingModels = new List<ParkingModel>();
             
             // load parking garages
@@ -51,6 +38,8 @@ namespace ParkEasyAPI.Controllers
                     coordinateModel.Latitude = garage.geometry.y;
                     coordinateModel.Longitude = garage.geometry.x;
                     model.Coordinate = coordinateModel;
+                    
+                    model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
                     
                     parkingModels.Add(model);
                 }
@@ -90,7 +79,28 @@ namespace ParkEasyAPI.Controllers
                 }
             }
             
-            Console.WriteLine(parkingModels.Count);
+            return parkingModels;
+        }
+        
+        // GET /closest
+        // https://github.com/ParkEasy/api/wiki/API-Docs#closest
+        [HttpGet]
+        [Route("closest")]
+        public dynamic Closest(float lat = -1, float lon = -1, int radius = 5000, int hours = 1)
+        {
+            // validity check: are lat and long specified?
+            if(lat < 0 || lon < 0) 
+            {
+                return "Error";
+            }
+            
+            // create coordinate model form user given parameter
+            CoordinateModel currentPosition = new CoordinateModel();
+            currentPosition.Latitude = lat;
+            currentPosition.Longitude = lon;
+            
+            // load data from various datasources
+            List<ParkingModel> parkingModels = this.LoadData(currentPosition);
             
             // filter out all the places that are not within radius distance
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
