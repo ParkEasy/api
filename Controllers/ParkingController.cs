@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
@@ -9,6 +10,13 @@ namespace ParkEasyAPI.Controllers
 {   
     public class ParkingController : Controller
     {
+        // DYNAMIC EXISTS
+        // checks if a property exists in a dynamic type
+        public static bool DynamicExist(dynamic settings, string name)
+        {
+            return settings.GetType().GetProperty(name) != null;
+        }
+        
         // LOAD DATA
         // loads data from various data sources
         private List<ParkingModel> LoadData(CoordinateModel currentPosition)
@@ -79,6 +87,56 @@ namespace ParkEasyAPI.Controllers
                 }
             }
             
+            // read local file of university parking spaces
+            using (StreamReader r = new StreamReader("uni.json"))
+            {
+                string unidata = r.ReadToEnd();
+                dynamic unijson = JsonConvert.DeserializeObject(unidata);
+                
+                foreach(dynamic uniparking in unijson) 
+                {
+                    ParkingModel model = new ParkingModel();
+                    
+                    model.Type = ParkingType.University;
+                    model.Name = uniparking.name;
+                    model.Description = string.Join(", ", uniparking.descriptions);
+                    model.Capacity = uniparking.num_spaces;
+                    model.CapacityDisabled = uniparking.num_disabled;
+                    model.CapacityService = uniparking.num_service;
+                    model.Gates = uniparking.gates;
+                    
+                    // parse opening hours
+                    if(DynamicExist(uniparking, "hours")) 
+                    {
+                        int i = 0;
+                        foreach(dynamic hour in uniparking.hours)
+                        {
+                            OpeningHoursModel hoursModel = new OpeningHoursModel();
+                            if(hour != null) {
+                                hoursModel.Open = hour.open;
+                                hoursModel.Close = hour.close;
+                            }
+                            else {
+                                hoursModel.Closed = true;
+                            }
+                            
+                            model.OpeningHours[i] = hoursModel;
+                            i++;
+                        }    
+                    }
+                    
+                    // parse coordinates
+                    CoordinateModel coordinateModel = new CoordinateModel();
+                    coordinateModel.Latitude = uniparking.coordinates.latitude;
+                    coordinateModel.Longitude = uniparking.coordinates.longitude;
+                    model.Coordinate = coordinateModel;
+                    
+                    model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                    
+                    parkingModels.Add(model);
+                }
+            }
+            
             return parkingModels;
         }
         
@@ -119,7 +177,7 @@ namespace ParkEasyAPI.Controllers
                 else return 0;
             });
             
-            return parkingModels;
+            return parkingModels.Take(10);
         }
     }
 }
