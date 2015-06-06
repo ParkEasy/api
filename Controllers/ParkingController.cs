@@ -88,9 +88,9 @@ namespace ParkEasyAPI.Controllers
             }
             
             // read local file of university parking spaces
-            using (StreamReader r = new StreamReader("uni.json"))
+            using(var client = new System.Net.WebClient()) 
             {
-                string unidata = r.ReadToEnd();
+                var unidata = client.DownloadString("https://raw.githubusercontent.com/ParkEasy/tools/master/uni.json");
                 dynamic unijson = JsonConvert.DeserializeObject(unidata);
                 
                 foreach(dynamic uniparking in unijson) 
@@ -165,6 +165,9 @@ namespace ParkEasyAPI.Controllers
             {
                 return a.DistanceToUser < radius / 1000;
             }).ToList<ParkingModel>();
+            
+            // apply scoring model
+            // ...
             
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
