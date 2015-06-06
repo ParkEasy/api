@@ -23,118 +23,164 @@ namespace ParkEasyAPI.Controllers
         {
             List<ParkingModel> parkingModels = new List<ParkingModel>();
             
-            // load parking garages
-            using(var client = new System.Net.WebClient())
-            {
-                var body = client.DownloadString("http://www.stadt-koeln.de/externe-dienste/open-data/parking.php");
-                dynamic json = JsonConvert.DeserializeObject(body);
-                
-                // parse parking garages into our parking model
-                foreach(dynamic garage in json.features) {
-                    
-                    ParkingModel model = new ParkingModel();
-                    
-                    // parse garage data
-                    model.Type = ParkingType.Garage;
-                    model.Name = garage.attributes.PARKHAUS;
-                    model.ID = garage.attributes.IDENTIFIER;
-                    model.Capacity = garage.attributes.KAPAZITAET;
-                    model.Trend = garage.attributes.TENDENZ;
-                    
-                    // parse coordinates
-                    CoordinateModel coordinateModel = new CoordinateModel();
-                    coordinateModel.Latitude = garage.geometry.y;
-                    coordinateModel.Longitude = garage.geometry.x;
-                    model.Coordinate = coordinateModel;
-                    
-                    model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
-                    
-                    parkingModels.Add(model);
-                }
-            }
+            // GARAGE DATA //
             
-            // load parking ticket machines
-            using(var client = new System.Net.WebClient()) 
-            {
-                var body = client.DownloadString("http://geoportal1.stadt-koeln.de/ArcGIS/rest/services/66/Parkscheinautomaten/MapServer/0/query?text=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&objectIds=&where=id%20is%20not%20null&time=&returnCountOnly=false&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=4326&outFields=%2A&f=json");
-                dynamic json = JsonConvert.DeserializeObject(body);
-                
-                // parse parking machines into our parking model
-                foreach(dynamic machine in json.features) {
-                    
-                    ParkingModel model = new ParkingModel();
-                    
-                    // parse garage data
-                    model.Type = ParkingType.TicketMachine;
-                    model.Name = machine.attributes.Aufstellort;
-                    model.ID = Convert.ToString(machine.attributes.ID);
-                    model.Capacity = machine.attributes.Stellplaetze;
-                    model.PricePerHour = Convert.ToDouble(machine.attributes.Gebuehr);
-                    model.MaximumParkingHours = Convert.ToDouble(machine.attributes.Hoechstparkdauer);
-                    model.RedPointText = machine.attributes.Roter_Punkt_Text;
-                    model.SectionFrom = machine.attributes.Abschnitt_Von;
-                    model.SectionTo = machine.attributes.Abschnitt_Bis;
-                    
-                    // parse coordinates
-                    CoordinateModel coordinateModel = new CoordinateModel();
-                    coordinateModel.Latitude = machine.geometry.y;
-                    coordinateModel.Longitude = machine.geometry.x;
-                    model.Coordinate = coordinateModel;
-                    
-                    model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
-                    
-                    parkingModels.Add(model);
-                }
-            }
+            dynamic jsonGarage;
             
-            // read local file of university parking spaces
-            using(var client = new System.Net.WebClient()) 
+            // use cache
+            Console.WriteLine(Cache.GarageDataExpiration.Value);
+            if(Cache.GarageData != null && Cache.GarageDataExpiration.HasValue && Cache.GarageDataExpiration.Value.CompareTo(DateTime.Now) <= 0) 
             {
-                var unidata = client.DownloadString("https://raw.githubusercontent.com/ParkEasy/tools/master/uni.json");
-                dynamic unijson = JsonConvert.DeserializeObject(unidata);
-                
-                foreach(dynamic uniparking in unijson) 
+                Console.WriteLine("Garages from Cache");
+                jsonGarage = Cache.GarageData;
+            }
+            else 
+            {
+                Console.WriteLine("Garages from WWW");
+                using(var client = new System.Net.WebClient())
                 {
-                    ParkingModel model = new ParkingModel();
-                    
-                    model.Type = ParkingType.University;
-                    model.Name = uniparking.name;
-                    model.Description = string.Join(", ", uniparking.descriptions);
-                    model.Capacity = uniparking.num_spaces;
-                    model.CapacityDisabled = uniparking.num_disabled;
-                    model.CapacityService = uniparking.num_service;
-                    model.Gates = uniparking.gates;
-                    
-                    // parse opening hours
-                    if(DynamicExist(uniparking, "hours")) 
-                    {
-                        int i = 0;
-                        foreach(dynamic hour in uniparking.hours)
-                        {
-                            OpeningHoursModel hoursModel = new OpeningHoursModel();
-                            if(hour != null) {
-                                hoursModel.Open = hour.open;
-                                hoursModel.Close = hour.close;
-                            }
-                            else {
-                                hoursModel.Closed = true;
-                            }
-                            
-                            model.OpeningHours[i] = hoursModel;
-                            i++;
-                        }    
-                    }
-                    
-                    // parse coordinates
-                    CoordinateModel coordinateModel = new CoordinateModel();
-                    coordinateModel.Latitude = uniparking.coordinates.latitude;
-                    coordinateModel.Longitude = uniparking.coordinates.longitude;
-                    model.Coordinate = coordinateModel;
-                    
-                    model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
-                    
-                    parkingModels.Add(model);
+                    var body = client.DownloadString("http://www.stadt-koeln.de/externe-dienste/open-data/parking.php");
+                    jsonGarage = JsonConvert.DeserializeObject(body); 
+                    Cache.GarageData = jsonGarage;
+                    Cache.GarageDataExpiration = DateTime.Now.AddMinutes(5);
                 }
+            }
+            
+            // parse parking garages into our parking model
+            foreach(dynamic garage in jsonGarage.features) {
+                
+                ParkingModel model = new ParkingModel();
+                
+                // parse garage data
+                model.Type = ParkingType.Garage;
+                model.Name = garage.attributes.PARKHAUS;
+                model.ID = garage.attributes.IDENTIFIER;
+                model.Capacity = garage.attributes.KAPAZITAET;
+                model.Trend = garage.attributes.TENDENZ;
+                
+                // parse coordinates
+                CoordinateModel coordinateModel = new CoordinateModel();
+                coordinateModel.Latitude = garage.geometry.y;
+                coordinateModel.Longitude = garage.geometry.x;
+                model.Coordinate = coordinateModel;
+                
+                model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                
+            }
+            
+            // MACHINE DATA //
+            
+            dynamic jsonMachine;
+            
+            // use cache
+            if(Cache.MachineData != null && Cache.MachineDataExpiration.HasValue && Cache.MachineDataExpiration.Value.CompareTo(DateTime.Now) <= 0) 
+            {
+                Console.WriteLine("Machine from Cache");
+                jsonMachine = Cache.MachineData;
+            }
+            else 
+            {
+                Console.WriteLine("Machine from WWW");
+                using(var client = new System.Net.WebClient())
+                {
+                    var body = client.DownloadString("http://geoportal1.stadt-koeln.de/ArcGIS/rest/services/66/Parkscheinautomaten/MapServer/0/query?text=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&objectIds=&where=id%20is%20not%20null&time=&returnCountOnly=false&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=4326&outFields=%2A&f=json");
+                    jsonMachine = JsonConvert.DeserializeObject(body); 
+                    Cache.MachineData = jsonMachine;
+                    Cache.MachineDataExpiration = DateTime.Now.AddMinutes(5);
+                }
+            }
+            
+            // parse parking machines into our parking model
+            foreach(dynamic machine in jsonMachine.features) 
+            {
+                
+                ParkingModel model = new ParkingModel();
+                
+                // parse garage data
+                model.Type = ParkingType.TicketMachine;
+                model.Name = machine.attributes.Aufstellort;
+                model.ID = Convert.ToString(machine.attributes.ID);
+                model.Capacity = machine.attributes.Stellplaetze;
+                model.PricePerHour = Convert.ToDouble(machine.attributes.Gebuehr);
+                model.MaximumParkingHours = Convert.ToDouble(machine.attributes.Hoechstparkdauer);
+                model.RedPointText = machine.attributes.Roter_Punkt_Text;
+                model.SectionFrom = machine.attributes.Abschnitt_Von;
+                model.SectionTo = machine.attributes.Abschnitt_Bis;
+                
+                // parse coordinates
+                CoordinateModel coordinateModel = new CoordinateModel();
+                coordinateModel.Latitude = machine.geometry.y;
+                coordinateModel.Longitude = machine.geometry.x;
+                model.Coordinate = coordinateModel;
+                
+                model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                
+                parkingModels.Add(model);
+            }
+            
+            // UNI DATA //
+            
+            dynamic jsonUni;
+            
+            // use cache
+            if(Cache.UniData != null && Cache.UniDataExpiration.HasValue && Cache.UniDataExpiration.Value.CompareTo(DateTime.Now) <= 0) 
+            {
+                Console.WriteLine("Uni from Cache");
+                jsonUni = Cache.MachineData;
+            }
+            else 
+            {
+                Console.WriteLine("Uni from WWW");
+                using(var client = new System.Net.WebClient())
+                {
+                    var body = client.DownloadString("https://raw.githubusercontent.com/ParkEasy/tools/master/uni.json");
+                    jsonUni = JsonConvert.DeserializeObject(body); 
+                    Cache.UniData = jsonUni;
+                    Cache.UniDataExpiration = DateTime.Now.AddMinutes(5);
+                }
+            }
+            
+            foreach(dynamic uniparking in jsonUni) 
+            {
+                ParkingModel model = new ParkingModel();
+                
+                model.Type = ParkingType.University;
+                model.Name = uniparking.name;
+                model.Description = string.Join(", ", uniparking.descriptions);
+                model.Capacity = uniparking.num_spaces;
+                model.CapacityDisabled = uniparking.num_disabled;
+                model.CapacityService = uniparking.num_service;
+                model.Gates = uniparking.gates;
+                
+                // parse opening hours
+                if(DynamicExist(uniparking, "hours")) 
+                {
+                    int i = 0;
+                    foreach(dynamic hour in uniparking.hours)
+                    {
+                        OpeningHoursModel hoursModel = new OpeningHoursModel();
+                        if(hour != null) {
+                            hoursModel.Open = hour.open;
+                            hoursModel.Close = hour.close;
+                        }
+                        else {
+                            hoursModel.Closed = true;
+                        }
+                        
+                        model.OpeningHours[i] = hoursModel;
+                        i++;
+                    }    
+                }
+                
+                // parse coordinates
+                CoordinateModel coordinateModel = new CoordinateModel();
+                coordinateModel.Latitude = uniparking.coordinates.latitude;
+                coordinateModel.Longitude = uniparking.coordinates.longitude;
+                model.Coordinate = coordinateModel;
+                
+                model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                
+                parkingModels.Add(model);
             }
             
             return parkingModels;
