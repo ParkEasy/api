@@ -1,8 +1,5 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNet.Mvc;
 using Newtonsoft.Json;
 using ParkEasyAPI.Models;
 

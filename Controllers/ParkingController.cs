@@ -1,9 +1,7 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
-using Newtonsoft.Json;
 using ParkEasyAPI.Models;
 
 namespace ParkEasyAPI.Controllers
@@ -22,6 +20,8 @@ namespace ParkEasyAPI.Controllers
                 return "Error";
             }
             
+            Console.WriteLine("----------------");
+            
             // create coordinate model form user given parameter
             CoordinateModel currentPosition = new CoordinateModel();
             currentPosition.Latitude = lat;
@@ -31,22 +31,27 @@ namespace ParkEasyAPI.Controllers
             ParkingLoader parkingLoader = new ParkingLoader();
             List<ParkingModel> parkingModels = parkingLoader.Load(currentPosition);
             
-            // filter out all the places that are not within radius distance
+            Console.WriteLine("{0} parking options overall", parkingModels.Count);
+            
+            // filter out all the places that are not within radius distance and 
+            // that have no space available anyway
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
             {
-                return a.DistanceToUser < radius / 1000;
+                return a.DistanceToUser < radius / 1000 && a.Capacity > 0;
                 
             }).ToList<ParkingModel>();
+            
+            Console.WriteLine("{0} parking options in radius", parkingModels.Count);
             
             // filter out places that have maximum parking hours lower than needed or 
             // opening hours that exceed the amount of time the user wants to park
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
-            {
+            {   
                 // are there limitations on the amount of parking hours?
                 if(a.MaximumParkingHours.HasValue) 
                 {
                     // does this exceed the amount of hours the user wants to park?
-                    if(a.MaximumParkingHours.Value > hours)
+                    if(a.MaximumParkingHours.Value > 0.0 && a.MaximumParkingHours.Value > hours)
                     {
                         return false;
                     }
@@ -65,12 +70,19 @@ namespace ParkEasyAPI.Controllers
                         return false;
                     }
                     
-                    // TODO: check if current time + parking duration in limits of opening hours
+                    // check if current time + parking duration in limits of opening hours
+                    int parkingDurationAbsolute = Int32.Parse(string.Format("hmm", DateTime.Now.AddHours(hours)));
+                    if(openingModel.Open > parkingDurationAbsolute && parkingDurationAbsolute > openingModel.Close)
+                    {
+                        return false;
+                    }
                 }
                 
                 return true;
                 
             }).ToList<ParkingModel>();
+            
+            Console.WriteLine("{0} parking options that are open/available", parkingModels.Count);
             
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
@@ -83,7 +95,7 @@ namespace ParkEasyAPI.Controllers
                 else return 0;
             });
             
-            return parkingModels.Take(10);
+            return parkingModels.Take(5);
         }
     }
 }
