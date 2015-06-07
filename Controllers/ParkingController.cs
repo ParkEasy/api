@@ -28,8 +28,7 @@ namespace ParkEasyAPI.Controllers
             dynamic jsonGarage;
             
             // use cache
-            Console.WriteLine(Cache.GarageDataExpiration.Value);
-            if(Cache.GarageData != null && Cache.GarageDataExpiration.HasValue && Cache.GarageDataExpiration.Value.CompareTo(DateTime.Now) <= 0) 
+            if(Cache.GarageData != null && Cache.GarageDataExpiration.HasValue && Cache.GarageDataExpiration.Value.CompareTo(DateTime.Now) >= 0) 
             {
                 Console.WriteLine("Garages from Cache");
                 jsonGarage = Cache.GarageData;
@@ -73,7 +72,7 @@ namespace ParkEasyAPI.Controllers
             dynamic jsonMachine;
             
             // use cache
-            if(Cache.MachineData != null && Cache.MachineDataExpiration.HasValue && Cache.MachineDataExpiration.Value.CompareTo(DateTime.Now) <= 0) 
+            if(Cache.MachineData != null && Cache.MachineDataExpiration.HasValue && Cache.MachineDataExpiration.Value.CompareTo(DateTime.Now) >= 0) 
             {
                 Console.WriteLine("Machine from Cache");
                 jsonMachine = Cache.MachineData;
@@ -123,10 +122,10 @@ namespace ParkEasyAPI.Controllers
             dynamic jsonUni;
             
             // use cache
-            if(Cache.UniData != null && Cache.UniDataExpiration.HasValue && Cache.UniDataExpiration.Value.CompareTo(DateTime.Now) <= 0) 
+            if(Cache.UniData != null && Cache.UniDataExpiration.HasValue && Cache.UniDataExpiration.Value.CompareTo(DateTime.Now) >= 0) 
             {
                 Console.WriteLine("Uni from Cache");
-                jsonUni = Cache.MachineData;
+                jsonUni = Cache.UniData;
             }
             else 
             {
