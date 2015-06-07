@@ -25,7 +25,6 @@ namespace ParkEasyAPI.Models
 		public OpeningHoursModel[] OpeningHours;
 		
 		public  ParkingModel() {
-			this.OpeningHours = new OpeningHoursModel[7];
 			this.Gates = false;
 		}
 	}
