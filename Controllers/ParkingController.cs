@@ -1,4 +1,5 @@
 using System;
+using System.Dynamic;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
@@ -14,10 +15,16 @@ namespace ParkEasyAPI.Controllers
         [Route("closest")]
         public dynamic Closest(float lat = -1, float lon = -1, int hours = 1)
         {
+            int START_RADIUS = 500;
+            int TAKE = 5;
+            
             // validity check: are lat and long specified?
             if(lat < 0 || lon < 0) 
             {
-                return "Error";
+                dynamic err = new Object();
+                err.error = "either 'lat' or 'lon' not defined as parameters";
+                
+                return err;
             }
             
             Console.WriteLine("----------------");
@@ -35,9 +42,9 @@ namespace ParkEasyAPI.Controllers
             
             // slowly increase the query radius by 500m until we found at least 
             // 5 parking spaces in radius
-            int radius = 500;
+            int radius = START_RADIUS;
             List<ParkingModel> radiusModels = new List<ParkingModel>();
-            while(radiusModels.Count <= 5) 
+            while(radiusModels.Count <= TAKE) 
             {
                 // filter all the places that are not within radius distance and 
                 // that have no space available anyway
@@ -106,7 +113,7 @@ namespace ParkEasyAPI.Controllers
                 else return 0;
             });
             
-            return parkingModels.Take(5);
+            return parkingModels.Take(TAKE);
         }
     }
 }
