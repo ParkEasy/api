@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using ParkEasyAPI.Models;
 
-namespace ParkEasyAPI.Controllers
+namespace ParkEasyAPI.Data
 {   
     public class ParkingLoader
 	{

@@ -1,6 +1,6 @@
 using System;
 
-namespace ParkEasyAPI
+namespace ParkEasyAPI.Data
 {
 	// Static class for caching remote WWW data
 	public static class Cache
