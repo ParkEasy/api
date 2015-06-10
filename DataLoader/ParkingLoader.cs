@@ -41,7 +41,7 @@ namespace ParkEasyAPI.Controllers
                     
                     // put data into cache 
                     Cache.GarageData = jsonGarage;
-                    Cache.GarageDataExpiration = DateTime.Now.AddMinutes(5);
+                    Cache.GarageDataExpiration = DateTime.Now.AddMinutes(30);
                 }
             }
             
@@ -87,7 +87,7 @@ namespace ParkEasyAPI.Controllers
                     
                     // put data in cache for 5 minutes
                     Cache.MachineData = jsonMachine;
-                    Cache.MachineDataExpiration = DateTime.Now.AddMinutes(5);
+                    Cache.MachineDataExpiration = DateTime.Now.AddMinutes(30);
                 }
             }
             
@@ -135,12 +135,12 @@ namespace ParkEasyAPI.Controllers
                 Console.WriteLine("Uni from WWW");
                 using(var client = new System.Net.WebClient())
                 {
-                    var body = client.DownloadString("https://raw.githubusercontent.com/ParkEasy/tools/master/uni.json");
+                    var body = client.DownloadString("https://github.com/ParkEasy/tools/releases/download/v1/uni.json");
                     jsonUni = JsonConvert.DeserializeObject(body); 
                     
-                    // put data in cache for 5 minutes
+                    // put data in cache
                     Cache.UniData = jsonUni;
-                    Cache.UniDataExpiration = DateTime.Now.AddMinutes(5);
+                    Cache.UniDataExpiration = DateTime.Now.AddMinutes(30);
                 }
             }
             
@@ -149,6 +149,7 @@ namespace ParkEasyAPI.Controllers
             {
                 ParkingModel model = new ParkingModel();
                 
+                model.ID = uniparking.name;
                 model.Type = ParkingType.University;
                 model.Name = uniparking.name;
                 model.Description = string.Join(", ", uniparking.descriptions);
@@ -156,6 +157,7 @@ namespace ParkEasyAPI.Controllers
                 model.CapacityDisabled = uniparking.num_disabled;
                 model.CapacityService = uniparking.num_service;
                 model.Gates = uniparking.gates;
+                model.PricePerHour = 1.3;
                 
                 // parse opening hours
                 if(DynamicExist(uniparking, "hours")) 

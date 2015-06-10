@@ -15,9 +15,10 @@ namespace ParkEasyAPI.Controllers
         [Route("closest")]
         public dynamic Closest(float lat = -1, float lon = -1, int hours = 1)
         {
-            int START_RADIUS = 500;
+            double START_RADIUS = 300.0;
+            double INCREMENT_RADIUS = 100.0; 
             int TAKE = 5;
-            int PARKING_RADIUS = 20;
+            double PARKING_RADIUS = 20.0;
             
             // validity check: are lat and long specified?
             if(lat < 0 || lon < 0) 
@@ -43,7 +44,7 @@ namespace ParkEasyAPI.Controllers
             
             // slowly increase the query radius by 500m until we found at least 
             // 5 parking spaces in radius
-            int radius = START_RADIUS;
+            double radius = START_RADIUS;
             List<ParkingModel> radiusModels = new List<ParkingModel>();
             while(radiusModels.Count <= TAKE) 
             {
@@ -51,11 +52,11 @@ namespace ParkEasyAPI.Controllers
                 // that have no space available anyway
                 radiusModels = parkingModels.Where(delegate(ParkingModel a)
                 {
-                    return a.DistanceToUser < radius / 1000 && a.Capacity > 0;
+                    return a.DistanceToUser < radius / 1000.0 && a.Capacity > 0;
                     
                 }).ToList<ParkingModel>();
                 
-                radius += 500;
+                radius += INCREMENT_RADIUS;
             }
 
             parkingModels = radiusModels;
@@ -119,14 +120,35 @@ namespace ParkEasyAPI.Controllers
             
             // check if a user is right on the closest parkingspot,
             // that would mean, that the STATE 'parked' would be induced
-            if(parkingModels.First().DistanceToUser <= PARKING_RADIUS)
+            if(parkingModels.First().DistanceToUser <= PARKING_RADIUS / 1000.0)
             {
                 returnValues.Add("state", "parking");
+                returnValues.Add("distance", parkingModels.First().DistanceToUser);
             }
+            
+            // user is still driving, we will offer him $(TAKE) of the best 
+            // parking spots sorrounding him
             else 
             {
-                returnValues.Add("state", "roaming");
-                returnValues.Add("parking", parkingModels.Take(TAKE));
+                // prepare the parking models for displaying on 
+                // the enduser device
+                List<Dictionary<string, object>> parking = new List<Dictionary<string, object>>();
+                    
+                foreach(ParkingModel model in parkingModels.Take(TAKE))
+                {
+                    Dictionary<string, object> data = new Dictionary<string, object>();
+                    data.Add("id", model.ID);
+                    data.Add("name", model.Name);
+                    data.Add("price", model.PricePerHour);
+                    data.Add("type", model.Type);
+                    data.Add("coord", new List<double>(){ model.Coordinate.Latitude, model.Coordinate.Longitude });
+                    
+                    parking.Add(data);
+                }
+                
+                returnValues.Add("state", "driving");
+                returnValues.Add("radius", radius);
+                returnValues.Add("parking", parking);
             }
             
             return returnValues;
