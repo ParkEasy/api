@@ -13,16 +13,19 @@ namespace ParkEasyAPI.Controllers
         // https://github.com/ParkEasy/api/wiki/API-Docs#closest
         [HttpGet]
         [Route("closest")]
-        public dynamic Closest(float lat = -1, float lon = -1, int hours = 1)
+        public dynamic Closest(float lat = -1, float lon = -1, int hours = 1, double speed = 0.0)
         {
             double START_RADIUS = 300.0;
             double INCREMENT_RADIUS = 100.0; 
             int TAKE = 5;
             double PARKING_RADIUS = 20.0;
+            double SLOW_SPEED = 3.0;
             
             // validity check: are lat and long specified?
             if(lat < 0 || lon < 0) 
             {
+                Response.StatusCode = 400;
+                
                 Dictionary<string, string> err = new Dictionary<string, string>();
                 err.Add("error", "either 'lat' or 'lon' not defined as parameters");
                 
@@ -120,10 +123,22 @@ namespace ParkEasyAPI.Controllers
             
             // check if a user is right on the closest parkingspot,
             // that would mean, that the STATE 'parked' would be induced
-            if(parkingModels.First().DistanceToUser <= PARKING_RADIUS / 1000.0)
+            if(parkingModels.First().DistanceToUser <= PARKING_RADIUS / 1000.0 && speed <= SLOW_SPEED)
             {
+                ParkingModel model = parkingModels.First();
+                
                 returnValues.Add("state", "parking");
-                returnValues.Add("distance", parkingModels.First().DistanceToUser);
+                returnValues.Add("distance", Math.Round(model.DistanceToUser, 2));
+                
+                Dictionary<string, object> data = new Dictionary<string, object>();
+                data.Add("id", model.ID);
+                data.Add("name", model.Name);
+                data.Add("price", model.PricePerHour);
+                data.Add("type", model.Type);
+                data.Add("redpoint", model.RedPointText);
+                data.Add("description", model.Description);
+                
+                returnValues.Add("parking", data);
             }
             
             // user is still driving, we will offer him $(TAKE) of the best 
