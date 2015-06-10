@@ -17,6 +17,7 @@ namespace ParkEasyAPI.Controllers
         {
             int START_RADIUS = 500;
             int TAKE = 5;
+            int PARKING_RADIUS = 20;
             
             // validity check: are lat and long specified?
             if(lat < 0 || lon < 0) 
@@ -113,7 +114,22 @@ namespace ParkEasyAPI.Controllers
                 else return 0;
             });
             
-            return parkingModels.Take(TAKE);
+            // dictionary to store return values that translate to JSON
+            Dictionary<string, object> returnValues = new Dictionary<string, object>();
+            
+            // check if a user is right on the closest parkingspot,
+            // that would mean, that the STATE 'parked' would be induced
+            if(parkingModels.First().DistanceToUser <= PARKING_RADIUS)
+            {
+                returnValues.Add("state", "parking");
+            }
+            else 
+            {
+                returnValues.Add("state", "roaming");
+                returnValues.Add("parking", parkingModels.Take(TAKE));
+            }
+            
+            return returnValues;
         }
     }
 }
