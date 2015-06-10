@@ -21,8 +21,8 @@ namespace ParkEasyAPI.Controllers
             // validity check: are lat and long specified?
             if(lat < 0 || lon < 0) 
             {
-                dynamic err = new Object();
-                err.error = "either 'lat' or 'lon' not defined as parameters";
+                Dictionary<string, string> err = new Dictionary<string, string>();
+                err.Add("error", "either 'lat' or 'lon' not defined as parameters");
                 
                 return err;
             }
