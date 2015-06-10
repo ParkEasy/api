@@ -33,7 +33,7 @@ namespace ParkEasyAPI.Controllers
             
             Console.WriteLine("{0} parking options overall", parkingModels.Count);
             
-            // filter out all the places that are not within radius distance and 
+            // filter all the places that are not within radius distance and 
             // that have no space available anyway
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
             {
@@ -43,7 +43,7 @@ namespace ParkEasyAPI.Controllers
             
             Console.WriteLine("{0} parking options in radius", parkingModels.Count);
             
-            // filter out places that have maximum parking hours lower than needed or 
+            // filter places that have maximum parking hours lower than needed or 
             // opening hours that exceed the amount of time the user wants to park
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
             {   
