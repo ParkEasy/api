@@ -12,7 +12,7 @@ namespace ParkEasyAPI.Controllers
         // https://github.com/ParkEasy/api/wiki/API-Docs#closest
         [HttpGet]
         [Route("closest")]
-        public dynamic Closest(float lat = -1, float lon = -1, int radius = 5000, int hours = 1)
+        public dynamic Closest(float lat = -1, float lon = -1, int hours = 1)
         {
             // validity check: are lat and long specified?
             if(lat < 0 || lon < 0) 
@@ -33,13 +33,24 @@ namespace ParkEasyAPI.Controllers
             
             Console.WriteLine("{0} parking options overall", parkingModels.Count);
             
-            // filter all the places that are not within radius distance and 
-            // that have no space available anyway
-            parkingModels = parkingModels.Where(delegate(ParkingModel a)
+            // slowly increase the query radius by 500m until we found at least 
+            // 5 parking spaces in radius
+            int radius = 500;
+            List<ParkingModel> radiusModels = new List<ParkingModel>();
+            while(radiusModels.Count <= 5) 
             {
-                return a.DistanceToUser < radius / 1000 && a.Capacity > 0;
+                // filter all the places that are not within radius distance and 
+                // that have no space available anyway
+                radiusModels = parkingModels.Where(delegate(ParkingModel a)
+                {
+                    return a.DistanceToUser < radius / 1000 && a.Capacity > 0;
+                    
+                }).ToList<ParkingModel>();
                 
-            }).ToList<ParkingModel>();
+                radius += 500;
+            }
+
+            parkingModels = radiusModels;
             
             Console.WriteLine("{0} parking options in radius", parkingModels.Count);
             
