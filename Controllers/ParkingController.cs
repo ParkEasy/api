@@ -1,9 +1,9 @@
 using System;
-using System.Dynamic;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 using ParkEasyAPI.Models;
+using ParkEasyAPI.Data;
 
 namespace ParkEasyAPI.Controllers
 {   
@@ -21,7 +21,7 @@ namespace ParkEasyAPI.Controllers
             double PARKING_RADIUS = 20.0;
             double SLOW_SPEED = 3.0;
             
-            // validity check: are lat and long specified?
+            // validity check: are lat and lon specified?
             if(lat < 0 || lon < 0) 
             {
                 Response.StatusCode = 400;
@@ -125,11 +125,15 @@ namespace ParkEasyAPI.Controllers
             // that would mean, that the STATE 'parked' would be induced
             if(parkingModels.First().DistanceToUser <= PARKING_RADIUS / 1000.0 && speed <= SLOW_SPEED)
             {
+                // the first parking spot in the - by distance - sorted list will
+                // be the closest
                 ParkingModel model = parkingModels.First();
                 
+                // set appropriate state
                 returnValues.Add("state", "parking");
                 returnValues.Add("distance", Math.Round(model.DistanceToUser, 2));
                 
+                // append information about the parking spot we are on right now
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 data.Add("id", model.ID);
                 data.Add("name", model.Name);
@@ -149,6 +153,7 @@ namespace ParkEasyAPI.Controllers
                 // the enduser device
                 List<Dictionary<string, object>> parking = new List<Dictionary<string, object>>();
                     
+                // append good parking options around user
                 foreach(ParkingModel model in parkingModels.Take(TAKE))
                 {
                     Dictionary<string, object> data = new Dictionary<string, object>();
@@ -161,6 +166,7 @@ namespace ParkEasyAPI.Controllers
                     parking.Add(data);
                 }
                 
+                // set appropriate state
                 returnValues.Add("state", "driving");
                 returnValues.Add("radius", radius);
                 returnValues.Add("parking", parking);
