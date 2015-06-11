@@ -43,34 +43,20 @@ namespace ParkEasyAPI.Controllers
             currentPosition.Longitude = lon;
             
             // use connection to mongodb
-            var database = Cache.MongoDBClient.GetDatabase("parkeasy");
-            var collection = database.GetCollection<ParkingModel>("parking");
+            var server = Cache.MongoDBClient.GetServer();
+            var database = server.GetDatabase("parkeasy");
+            var collectionParking = database.GetCollection<ParkingModel>("parking");
             
             // load all parking options from mongodb
             List<ParkingModel> parkingModels = new List<ParkingModel>();
-            
-            Task<List<ParkingModel>> t = Task.Run(async () =>
-            {
-                List<ParkingModel> models = new List<ParkingModel>();
-                using (var cursor = await collection.Find(new MongoDB.Bson.BsonDocument()).ToCursorAsync())
-                {
-                    while (await cursor.MoveNextAsync())
-                    {
-                        foreach (var doc in cursor.Current)
-                        {
-                            // do something with the documents
-                            ParkingModel model = doc;
-                            model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
-                            parkingModels.Add(model);
-                            Console.WriteLine(model.Id);
-                        }
-                    }
-                }
+           
+            // fetch all parking options
+            foreach (ParkingModel model in collectionParking.FindAll()) {
                 
-                return models;
-            });
-            
-            parkingModels = t.Result;
+                // calculate the distance to the user and add to working list
+                model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                parkingModels.Add(model);
+            }
             
             Console.WriteLine("{0} parking options overall", parkingModels.Count);
             
