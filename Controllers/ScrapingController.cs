@@ -19,6 +19,8 @@ namespace ParkEasyAPI.Controllers
             // read all parking options form webservices
 			List<ParkingModel> models = new ParkingLoader().Load();
             
+            return Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb");
+            
             // open connection to mongodb
             var client = new MongoClient(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb"));
             var database = client.GetDatabase("parkeasy");
