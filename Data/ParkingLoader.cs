@@ -16,7 +16,7 @@ namespace ParkEasyAPI.Data
         
         // LOAD DATA
         // loads data from various data sources
-        public List<ParkingModel> Load(CoordinateModel currentPosition)
+        public List<ParkingModel> Load()
         {
             List<ParkingModel> parkingModels = new List<ParkingModel>();
             
@@ -63,7 +63,7 @@ namespace ParkEasyAPI.Data
                 coordinateModel.Longitude = garage.geometry.x;
                 model.Coordinate = coordinateModel;
                 
-                model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                //model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
             }
             
             // MACHINE DATA //
@@ -114,7 +114,7 @@ namespace ParkEasyAPI.Data
                 coordinateModel.Longitude = machine.geometry.x;
                 model.Coordinate = coordinateModel;
                 
-                model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                //model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
                 
                 parkingModels.Add(model);
             }
@@ -189,7 +189,7 @@ namespace ParkEasyAPI.Data
                 coordinateModel.Longitude = uniparking.coordinates.longitude;
                 model.Coordinate = coordinateModel;
                 
-                model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                //model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
                 
                 parkingModels.Add(model);
             }
