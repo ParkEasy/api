@@ -22,11 +22,17 @@ namespace ParkEasyAPI.Controllers
             // open connection to mongodb
             var client = new MongoClient(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb"));
             var database = client.GetDatabase("parkeasy");
-            var collection = client.GetCollection<ParkingModel>("parking");
+            var collection = database.GetCollection<ParkingModel>("parking");
             
-            var list = await collection.Find().ToListAsync();
+            // upsert each of the available parking options
+            foreach(ParkingModel model in models)
+            {
+                UpdateOptions options = new UpdateOptions();
+                options.IsUpsert = true;
+                collection.ReplaceOneAsync(x => x.ID == model.ID, model, options);
+            }
             
-            return list;
+            return true;
 		}
 	}
 }
