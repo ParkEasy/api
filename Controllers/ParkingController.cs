@@ -9,11 +9,11 @@ namespace ParkEasyAPI.Controllers
 {   
     public class ParkingController : Controller
     {   
-        // GET /closest
-        // https://github.com/ParkEasy/api/wiki/API-Docs#closest
+        // GET /search
+        // https://github.com/ParkEasy/api/wiki/API-Docs#search
         [HttpGet]
-        [Route("closest")]
-        public dynamic Closest(float lat = -1, float lon = -1, int hours = 1, double speed = 0.0)
+        [Route("search")]
+        public dynamic Search(float lat = -1, float lon = -1, int hours = 1, double speed = 0.0)
         {
             double START_RADIUS = 300.0;
             double INCREMENT_RADIUS = 100.0; 
@@ -41,7 +41,7 @@ namespace ParkEasyAPI.Controllers
             
             // load data from various datasources
             ParkingLoader parkingLoader = new ParkingLoader();
-            List<ParkingModel> parkingModels = parkingLoader.Load(currentPosition);
+            List<ParkingModel> parkingModels = parkingLoader.Load();
             
             Console.WriteLine("{0} parking options overall", parkingModels.Count);
             
