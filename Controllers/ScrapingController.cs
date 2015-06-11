@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
 using ParkEasyAPI.Models;
@@ -19,19 +20,17 @@ namespace ParkEasyAPI.Controllers
 			List<ParkingModel> models = new ParkingLoader().Load();
             
             // open connection to mongodb
-            var client = new MongoClient(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb"));
-            var database = client.GetDatabase("parkeasy");
+            var server = Cache.MongoDBClient.GetServer();
+            var database = server.GetDatabase("parkeasy");
             var collection = database.GetCollection<ParkingModel>("parking");
             
             // upsert each of the available parking options
             foreach(ParkingModel model in models)
-            {
-                UpdateOptions options = new UpdateOptions();
-                options.IsUpsert = true;
-                collection.ReplaceOneAsync(x => x.ID == model.ID, model, options);
+            {   
+                collection.Save(model);
             }
             
-            return true;
+            return models.Count;
 		}
 	}
 }

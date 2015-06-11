@@ -5,7 +5,7 @@ namespace ParkEasyAPI.Models
 	
     public class ParkingModel 
 	{
-		public string ID;
+		public string Id;
 		public string Name;	
 		public string Description;
 		public ParkingType Type;

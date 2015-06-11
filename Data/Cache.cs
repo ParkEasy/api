@@ -1,4 +1,5 @@
 using System;
+using MongoDB.Driver;
 
 namespace ParkEasyAPI.Data
 {
@@ -12,5 +13,8 @@ namespace ParkEasyAPI.Data
 		public static DateTime? MachineDataExpiration;
 		public static dynamic UniData;
 		public static DateTime? UniDataExpiration;
+		
+		// MONGODB
+		public static MongoClient MongoDBClient;
 	}
 }

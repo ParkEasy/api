@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using ParkEasyAPI.Models;
 using ParkEasyAPI.Data;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace ParkEasyAPI.Controllers
 {   
@@ -39,9 +42,35 @@ namespace ParkEasyAPI.Controllers
             currentPosition.Latitude = lat;
             currentPosition.Longitude = lon;
             
-            // load data from various datasources
-            ParkingLoader parkingLoader = new ParkingLoader();
-            List<ParkingModel> parkingModels = parkingLoader.Load();
+            // use connection to mongodb
+            var database = Cache.MongoDBClient.GetDatabase("parkeasy");
+            var collection = database.GetCollection<ParkingModel>("parking");
+            
+            // load all parking options from mongodb
+            List<ParkingModel> parkingModels = new List<ParkingModel>();
+            
+            Task<List<ParkingModel>> t = Task.Run(async () =>
+            {
+                List<ParkingModel> models = new List<ParkingModel>();
+                using (var cursor = await collection.Find(new MongoDB.Bson.BsonDocument()).ToCursorAsync())
+                {
+                    while (await cursor.MoveNextAsync())
+                    {
+                        foreach (var doc in cursor.Current)
+                        {
+                            // do something with the documents
+                            ParkingModel model = doc;
+                            model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                            parkingModels.Add(model);
+                            Console.WriteLine(model.Id);
+                        }
+                    }
+                }
+                
+                return models;
+            });
+            
+            parkingModels = t.Result;
             
             Console.WriteLine("{0} parking options overall", parkingModels.Count);
             
@@ -135,7 +164,7 @@ namespace ParkEasyAPI.Controllers
                 
                 // append information about the parking spot we are on right now
                 Dictionary<string, object> data = new Dictionary<string, object>();
-                data.Add("id", model.ID);
+                data.Add("id", model.Id);
                 data.Add("name", model.Name);
                 data.Add("price", model.PricePerHour);
                 data.Add("type", model.Type);
@@ -157,7 +186,7 @@ namespace ParkEasyAPI.Controllers
                 foreach(ParkingModel model in parkingModels.Take(TAKE))
                 {
                     Dictionary<string, object> data = new Dictionary<string, object>();
-                    data.Add("id", model.ID);
+                    data.Add("id", model.Id);
                     data.Add("name", model.Name);
                     data.Add("price", model.PricePerHour);
                     data.Add("type", model.Type);

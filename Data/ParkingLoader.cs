@@ -53,7 +53,7 @@ namespace ParkEasyAPI.Data
                 // parse garage data
                 model.Type = ParkingType.Garage;
                 model.Name = garage.attributes.PARKHAUS;
-                model.ID = garage.attributes.IDENTIFIER;
+                model.Id = garage.attributes.IDENTIFIER;
                 model.Capacity = garage.attributes.KAPAZITAET;
                 model.Trend = garage.attributes.TENDENZ;
                 
@@ -100,7 +100,7 @@ namespace ParkEasyAPI.Data
                 // parse garage data
                 model.Type = ParkingType.TicketMachine;
                 model.Name = machine.attributes.Aufstellort;
-                model.ID = Convert.ToString(machine.attributes.ID);
+                model.Id = Convert.ToString(machine.attributes.ID);
                 model.Capacity = machine.attributes.Stellplaetze;
                 model.PricePerHour = Convert.ToDouble(machine.attributes.Gebuehr);
                 model.MaximumParkingHours = Convert.ToDouble(machine.attributes.Hoechstparkdauer);
@@ -149,7 +149,7 @@ namespace ParkEasyAPI.Data
             {
                 ParkingModel model = new ParkingModel();
                 
-                model.ID = uniparking.name;
+                model.Id = uniparking.name;
                 model.Type = ParkingType.University;
                 model.Name = uniparking.name;
                 model.Description = string.Join(", ", uniparking.descriptions);
