@@ -23,7 +23,7 @@ namespace ParkEasyAPI
             }
             else 
             {
-                Cache.MongoDBClient = new MongoClient("mongodb://readonly:readonly.mongolab.com:36178/parkeasy");
+                Cache.MongoDBClient = new MongoClient("mongodb://readonly:readonly@ds036178.mongolab.com:36178/parkeasy");
             }
         }
 

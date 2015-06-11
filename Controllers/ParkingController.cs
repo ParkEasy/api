@@ -51,8 +51,8 @@ namespace ParkEasyAPI.Controllers
             List<ParkingModel> parkingModels = new List<ParkingModel>();
            
             // fetch all parking options
-            foreach (ParkingModel model in collectionParking.FindAll()) {
-                
+            foreach (ParkingModel model in collectionParking.FindAll()) 
+            {    
                 // calculate the distance to the user and add to working list
                 model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
                 parkingModels.Add(model);
