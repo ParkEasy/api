@@ -7,6 +7,8 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.DependencyInjection;
+using MongoDB.Driver;
+using ParkEasyAPI.Data;
 
 namespace ParkEasyAPI
 {
@@ -14,6 +16,15 @@ namespace ParkEasyAPI
     {
         public Startup(IHostingEnvironment env)
         {
+            // initilize and store the mongodb connection
+            if(!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb ")))
+            {
+                Cache.MongoDBClient = new MongoClient(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb"));
+            }
+            else 
+            {
+                Cache.MongoDBClient = new MongoClient("mongodb://parkeasy:no5lebt@ds036178.mongolab.com:36178/parkeasy");
+            }
         }
 
         // This method gets called by a runtime.
