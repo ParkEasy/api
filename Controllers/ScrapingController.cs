@@ -20,7 +20,7 @@ namespace ParkEasyAPI.Controllers
 			List<ParkingModel> models = new ParkingLoader().Load();
             
             // open connection to mongodb
-            var client = new MongoClient(Environment.GetEnvironmentVariable("mongodb"));
+            var client = new MongoClient(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb"));
             var database = client.GetDatabase("parkeasy");
             var collection = client.GetCollection<ParkingModel>("parking");
             
