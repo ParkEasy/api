@@ -1,5 +1,3 @@
-using System;
-
 namespace ParkEasyAPI.Models
 {
 	

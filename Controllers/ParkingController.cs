@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using ParkEasyAPI.Models;
-using ParkEasyAPI.Data;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -43,7 +41,7 @@ namespace ParkEasyAPI.Controllers
             currentPosition.Longitude = lon;
             
             // use connection to mongodb
-            var server = Cache.MongoDBClient.GetServer();
+            var server = StaticGlobal.MongoDBClient.GetServer();
             var database = server.GetDatabase("parkeasy");
             var collectionParking = database.GetCollection<ParkingModel>("parking");
             
