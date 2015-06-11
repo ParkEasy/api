@@ -16,7 +16,7 @@ namespace ParkEasyAPI
         public Startup(IHostingEnvironment env)
         {
             // initilize and store the mongodb connection
-            if(!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb ")))
+            if(!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb")))
             {
                 StaticGlobal.MongoDBClient = new MongoClient(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb"));
             }
