@@ -8,7 +8,8 @@
       "Microsoft.AspNet.Server.WebListener >= 1.0.0-beta4",
       "Microsoft.AspNet.StaticFiles >= 1.0.0-beta4",
       "Kestrel >= 1.0.0-beta4",
-      "Newtonsoft.Json >= 6.0.8"
+      "Newtonsoft.Json >= 6.0.8",
+      "mongocsharpdriver >= 2.0.1"
     ],
     "DNX,Version=v4.5.1": [],
     "DNXCore,Version=v5.0": []
@@ -3002,6 +3003,143 @@
         "lib/contract/Microsoft.Win32.Registry.dll",
         "lib/net45/Microsoft.Win32.Registry.dll",
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/Microsoft.Win32.Registry.dll"
+      ]
+    },
+    "mongocsharpdriver/2.0.1": {
+      "serviceable": false,
+      "sha": "f4qbmhly9bW4jq+4tYov2KrO8OBOvqcb07xwRUooCuodk/dbpXVXdcSM9wUNBIPCE4PaW8H6yyvWHUgcyqdH6A==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "MongoDB.Bson": "2.0.1",
+            "MongoDB.Driver.Core": "2.0.1",
+            "MongoDB.Driver": "2.0.1"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/MongoDB.Driver.Legacy.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/MongoDB.Driver.Legacy.dll"
+          ]
+        },
+        "DNXCore,Version=v5.0": {
+          "dependencies": {
+            "MongoDB.Bson": "2.0.1",
+            "MongoDB.Driver.Core": "2.0.1",
+            "MongoDB.Driver": "2.0.1"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        }
+      },
+      "files": [
+        "License.rtf",
+        "mongocsharpdriver.2.0.1.nupkg",
+        "mongocsharpdriver.2.0.1.nupkg.sha512",
+        "mongocsharpdriver.nuspec",
+        "lib/net45/MongoDB.Driver.Legacy.XML",
+        "lib/net45/MongoDB.Driver.Legacy.dll"
+      ]
+    },
+    "MongoDB.Bson/2.0.1": {
+      "serviceable": false,
+      "sha": "dr8KYpTt5VIqGWQ5Bzud2BA/lH2csIfL5WLrfc90UzSWGF378ugvEo5tx4J0eZohvHzsRRiMS2YTmJOTRN+iYg==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/MongoDB.Bson.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/MongoDB.Bson.dll"
+          ]
+        },
+        "DNXCore,Version=v5.0": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        }
+      },
+      "files": [
+        "License.rtf",
+        "MongoDB.Bson.2.0.1.nupkg",
+        "MongoDB.Bson.2.0.1.nupkg.sha512",
+        "MongoDB.Bson.nuspec",
+        "lib/net45/MongoDB.Bson.XML",
+        "lib/net45/MongoDB.Bson.dll"
+      ]
+    },
+    "MongoDB.Driver/2.0.1": {
+      "serviceable": false,
+      "sha": "awzcHfguHkgLSVniMbDAtKNUNNfEyCrYaErsnCN8ZVAY1R3puD/R/GQRzb1GJDS4vfy+oC4VXAbawxJekt8soA==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "MongoDB.Bson": "2.0.1",
+            "MongoDB.Driver.Core": "2.0.1"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/MongoDB.Driver.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/MongoDB.Driver.dll"
+          ]
+        },
+        "DNXCore,Version=v5.0": {
+          "dependencies": {
+            "MongoDB.Bson": "2.0.1",
+            "MongoDB.Driver.Core": "2.0.1"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        }
+      },
+      "files": [
+        "License.rtf",
+        "MongoDB.Driver.2.0.1.nupkg",
+        "MongoDB.Driver.2.0.1.nupkg.sha512",
+        "MongoDB.Driver.nuspec",
+        "lib/net45/MongoDB.Driver.XML",
+        "lib/net45/MongoDB.Driver.dll"
+      ]
+    },
+    "MongoDB.Driver.Core/2.0.1": {
+      "serviceable": false,
+      "sha": "WLHeCKKIFU0XbO6Py8qP/cJqK2aLexaq72EICBHgdwhpqYidqeJuZnDrK/5mnUPRi7bcAtfpcurHfWkjSYHNGg==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "MongoDB.Bson": "2.0.1"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/MongoDB.Driver.Core.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/MongoDB.Driver.Core.dll"
+          ]
+        },
+        "DNXCore,Version=v5.0": {
+          "dependencies": {
+            "MongoDB.Bson": "2.0.1"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        }
+      },
+      "files": [
+        "License.rtf",
+        "MongoDB.Driver.Core.2.0.1.nupkg",
+        "MongoDB.Driver.Core.2.0.1.nupkg.sha512",
+        "MongoDB.Driver.Core.nuspec",
+        "lib/net45/MongoDB.Driver.Core.dll"
       ]
     },
     "Newtonsoft.Json/6.0.8": {
