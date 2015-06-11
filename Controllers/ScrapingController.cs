@@ -52,6 +52,8 @@ namespace ParkEasyAPI.Controllers
                 coordinateModel.Latitude = garage.geometry.y;
                 coordinateModel.Longitude = garage.geometry.x;
                 model.Coordinate = coordinateModel;
+                
+                model.Coordinates = new double[2] {coordinateModel.Longitude, coordinateModel.Latitude};
             }
             
             // MACHINE DATA //
@@ -87,6 +89,8 @@ namespace ParkEasyAPI.Controllers
                 coordinateModel.Latitude = machine.geometry.y;
                 coordinateModel.Longitude = machine.geometry.x;
                 model.Coordinate = coordinateModel;
+                
+                model.Coordinates = new double[2] {coordinateModel.Longitude, coordinateModel.Latitude};
                 
                 parkingModels.Add(model);
             }
@@ -146,6 +150,8 @@ namespace ParkEasyAPI.Controllers
                 coordinateModel.Latitude = uniparking.coordinates.latitude;
                 coordinateModel.Longitude = uniparking.coordinates.longitude;
                 model.Coordinate = coordinateModel;
+                
+                model.Coordinates = new double[2] {coordinateModel.Longitude, coordinateModel.Latitude};
                 
                 parkingModels.Add(model);
             }

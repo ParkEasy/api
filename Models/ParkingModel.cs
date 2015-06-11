@@ -1,6 +1,5 @@
 namespace ParkEasyAPI.Models
-{
-	
+{	
     public class ParkingModel 
 	{
 		public string Id;
@@ -8,6 +7,7 @@ namespace ParkEasyAPI.Models
 		public string Description;
 		public ParkingType Type;
 		public CoordinateModel Coordinate;
+		public double[] Coordinates;
 		public int? Capacity; // free spaces in parking space
 		public int? CapacityWomen; // free spaces especially for women
 		public int? CapacityDisabled; // free spaces for disabled humans
@@ -24,6 +24,7 @@ namespace ParkEasyAPI.Models
 		
 		public  ParkingModel() {
 			this.Gates = false;
+			this.Coordinates = new double[2];
 		}
 	}
 	
