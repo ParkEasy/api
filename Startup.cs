@@ -7,6 +7,9 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.DependencyInjection;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using ParkEasyAPI.Models;
 
 namespace ParkEasyAPI
 {
@@ -14,6 +17,10 @@ namespace ParkEasyAPI
     {
         public Startup(IHostingEnvironment env)
         {
+            /*BsonClassMap.RegisterClassMap<ParkingModel>(cm => 
+            {
+                cm.AutoMap();
+            });*/
         }
 
         // This method gets called by a runtime.
