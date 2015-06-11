@@ -4,8 +4,8 @@ using System.Linq;
 using Microsoft.AspNet.Mvc;
 using ParkEasyAPI.Models;
 using ParkEasyAPI.Data;
-using MongoDB.Bson;
-using MongoDB.Driver;
+//using MongoDB.Bson;
+//using MongoDB.Driver;
 
 namespace ParkEasyAPI.Controllers
 {   
@@ -20,7 +20,7 @@ namespace ParkEasyAPI.Controllers
 			List<ParkingModel> models = new ParkingLoader().Load();
             
             return "hello world";
-            
+            /*
             // open connection to mongodb
             var client = new MongoClient(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb"));
             var database = client.GetDatabase("parkeasy");
@@ -34,7 +34,7 @@ namespace ParkEasyAPI.Controllers
                 collection.ReplaceOneAsync(x => x.ID == model.ID, model, options);
             }
             
-            return true;
+            return true;*/
 		}
 	}
 }
