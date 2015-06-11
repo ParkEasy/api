@@ -5,6 +5,7 @@ using Microsoft.AspNet.Mvc;
 using ParkEasyAPI.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Builders;
 
 namespace ParkEasyAPI.Controllers
 {   
@@ -48,36 +49,16 @@ namespace ParkEasyAPI.Controllers
             // load all parking options from mongodb
             List<ParkingModel> parkingModels = new List<ParkingModel>();
            
-            // fetch all parking options
-            foreach (ParkingModel model in collectionParking.FindAll()) 
+            // fetch all parking options sorted by nearest
+            var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude);
+            foreach (ParkingModel model in collectionParking.Find(query).SetLimit(500)) 
             {    
                 // calculate the distance to the user and add to working list
                 model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
                 parkingModels.Add(model);
             }
             
-            Console.WriteLine("{0} parking options overall", parkingModels.Count);
-            
-            // slowly increase the query radius by 500m until we found at least 
-            // 5 parking spaces in radius
-            double radius = START_RADIUS;
-            List<ParkingModel> radiusModels = new List<ParkingModel>();
-            while(radiusModels.Count <= TAKE) 
-            {
-                // filter all the places that are not within radius distance and 
-                // that have no space available anyway
-                radiusModels = parkingModels.Where(delegate(ParkingModel a)
-                {
-                    return a.DistanceToUser < radius / 1000.0 && a.Capacity > 0;
-                    
-                }).ToList<ParkingModel>();
-                
-                radius += INCREMENT_RADIUS;
-            }
-
-            parkingModels = radiusModels;
-            
-            Console.WriteLine("{0} parking options in radius", parkingModels.Count);
+            Console.WriteLine("{0} parking options", parkingModels.Count);
             
             // filter places that have maximum parking hours lower than needed or 
             // opening hours that exceed the amount of time the user wants to park
@@ -181,7 +162,6 @@ namespace ParkEasyAPI.Controllers
                 
                 // set appropriate state
                 returnValues.Add("state", "driving");
-                returnValues.Add("radius", radius);
                 returnValues.Add("parking", parking);
             }
             
