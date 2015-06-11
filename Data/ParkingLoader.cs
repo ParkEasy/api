@@ -22,29 +22,20 @@ namespace ParkEasyAPI.Data
             
             // GARAGE DATA //
             
-            // use cache or fetch remote?
             dynamic jsonGarage;
-            if(Cache.GarageData != null && Cache.GarageDataExpiration.HasValue && Cache.GarageDataExpiration.Value.CompareTo(DateTime.Now) >= 0) 
-            {
-                // load data from cache
-                Console.WriteLine("Garages from Cache");
-                jsonGarage = Cache.GarageData;
-            }
-            else 
-            {
-                // load data from remote source
-                Console.WriteLine("Garages from WWW");
-                using(var client = new System.Net.WebClient())
-                {
-                    var body = client.DownloadString("http://www.stadt-koeln.de/externe-dienste/open-data/parking.php");
-                    jsonGarage = JsonConvert.DeserializeObject(body);
-                    
-                    // put data into cache 
-                    Cache.GarageData = jsonGarage;
-                    Cache.GarageDataExpiration = DateTime.Now.AddMinutes(30);
-                }
-            }
             
+            // load data from remote source
+            Console.WriteLine("Garages from WWW");
+            using(var client = new System.Net.WebClient())
+            {
+                var body = client.DownloadString("http://www.stadt-koeln.de/externe-dienste/open-data/parking.php");
+                jsonGarage = JsonConvert.DeserializeObject(body);
+                
+                // put data into cache 
+                Cache.GarageData = jsonGarage;
+                Cache.GarageDataExpiration = DateTime.Now.AddMinutes(30);
+            }
+                
             // parse parking garages into our parking model
             foreach(dynamic garage in jsonGarage.features) 
             {    
@@ -68,27 +59,18 @@ namespace ParkEasyAPI.Data
             
             // MACHINE DATA //
             
-            // use cache or fetch remote?
             dynamic jsonMachine;
-            if(Cache.MachineData != null && Cache.MachineDataExpiration.HasValue && Cache.MachineDataExpiration.Value.CompareTo(DateTime.Now) >= 0) 
+            
+            // load data from remote source
+            Console.WriteLine("Machine from WWW");
+            using(var client = new System.Net.WebClient())
             {
-                // load data from cache
-                Console.WriteLine("Machine from Cache");
-                jsonMachine = Cache.MachineData;
-            }
-            else 
-            {
-                // load data from remote source
-                Console.WriteLine("Machine from WWW");
-                using(var client = new System.Net.WebClient())
-                {
-                    var body = client.DownloadString("http://geoportal1.stadt-koeln.de/ArcGIS/rest/services/66/Parkscheinautomaten/MapServer/0/query?text=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&objectIds=&where=id%20is%20not%20null&time=&returnCountOnly=false&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=4326&outFields=%2A&f=json");
-                    jsonMachine = JsonConvert.DeserializeObject(body); 
-                    
-                    // put data in cache for 5 minutes
-                    Cache.MachineData = jsonMachine;
-                    Cache.MachineDataExpiration = DateTime.Now.AddMinutes(30);
-                }
+                var body = client.DownloadString("http://geoportal1.stadt-koeln.de/ArcGIS/rest/services/66/Parkscheinautomaten/MapServer/0/query?text=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&objectIds=&where=id%20is%20not%20null&time=&returnCountOnly=false&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=4326&outFields=%2A&f=json");
+                jsonMachine = JsonConvert.DeserializeObject(body); 
+                
+                // put data in cache for 5 minutes
+                Cache.MachineData = jsonMachine;
+                Cache.MachineDataExpiration = DateTime.Now.AddMinutes(30);
             }
             
             // parse parking machines into our parking model
@@ -121,27 +103,18 @@ namespace ParkEasyAPI.Data
             
             // UNI DATA //
             
-            // use cache or fetch from remote?
             dynamic jsonUni;
-            if(Cache.UniData != null && Cache.UniDataExpiration.HasValue && Cache.UniDataExpiration.Value.CompareTo(DateTime.Now) >= 0) 
+            
+            // load data from remote source
+            Console.WriteLine("Uni from WWW");
+            using(var client = new System.Net.WebClient())
             {
-                // load data from cache
-                Console.WriteLine("Uni from Cache");
-                jsonUni = Cache.UniData;
-            }
-            else 
-            {
-                // load data from remote source
-                Console.WriteLine("Uni from WWW");
-                using(var client = new System.Net.WebClient())
-                {
-                    var body = client.DownloadString("https://github.com/ParkEasy/tools/releases/download/v1/uni.json");
-                    jsonUni = JsonConvert.DeserializeObject(body); 
-                    
-                    // put data in cache
-                    Cache.UniData = jsonUni;
-                    Cache.UniDataExpiration = DateTime.Now.AddMinutes(30);
-                }
+                var body = client.DownloadString("https://github.com/ParkEasy/tools/releases/download/v1/uni.json");
+                jsonUni = JsonConvert.DeserializeObject(body); 
+                
+                // put data in cache
+                Cache.UniData = jsonUni;
+                Cache.UniDataExpiration = DateTime.Now.AddMinutes(30);
             }
             
             // loop university parking spaces

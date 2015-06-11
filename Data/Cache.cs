@@ -1,20 +1,16 @@
 using System;
+using System.Collections.Generic;
 using MongoDB.Driver;
+using ParkEasyAPI.Models;
 
 namespace ParkEasyAPI.Data
 {
 	// Static class for caching remote WWW data
 	public static class Cache
 	{
-		public static dynamic GarageData;
-		public static DateTime? GarageDataExpiration;
+		public static List<ParkingModel> ParkingModels;
 		
-		public static dynamic MachineData;
-		public static DateTime? MachineDataExpiration;
-		public static dynamic UniData;
-		public static DateTime? UniDataExpiration;
-		
-		// MONGODB
+		// MongoDB
 		public static MongoClient MongoDBClient;
 	}
 }
