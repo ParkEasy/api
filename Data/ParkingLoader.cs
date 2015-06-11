@@ -30,10 +30,6 @@ namespace ParkEasyAPI.Data
             {
                 var body = client.DownloadString("http://www.stadt-koeln.de/externe-dienste/open-data/parking.php");
                 jsonGarage = JsonConvert.DeserializeObject(body);
-                
-                // put data into cache 
-                Cache.GarageData = jsonGarage;
-                Cache.GarageDataExpiration = DateTime.Now.AddMinutes(30);
             }
                 
             // parse parking garages into our parking model
@@ -53,8 +49,6 @@ namespace ParkEasyAPI.Data
                 coordinateModel.Latitude = garage.geometry.y;
                 coordinateModel.Longitude = garage.geometry.x;
                 model.Coordinate = coordinateModel;
-                
-                //model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
             }
             
             // MACHINE DATA //
@@ -67,10 +61,6 @@ namespace ParkEasyAPI.Data
             {
                 var body = client.DownloadString("http://geoportal1.stadt-koeln.de/ArcGIS/rest/services/66/Parkscheinautomaten/MapServer/0/query?text=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&objectIds=&where=id%20is%20not%20null&time=&returnCountOnly=false&returnIdsOnly=false&returnGeometry=true&maxAllowableOffset=&outSR=4326&outFields=%2A&f=json");
                 jsonMachine = JsonConvert.DeserializeObject(body); 
-                
-                // put data in cache for 5 minutes
-                Cache.MachineData = jsonMachine;
-                Cache.MachineDataExpiration = DateTime.Now.AddMinutes(30);
             }
             
             // parse parking machines into our parking model
@@ -96,8 +86,6 @@ namespace ParkEasyAPI.Data
                 coordinateModel.Longitude = machine.geometry.x;
                 model.Coordinate = coordinateModel;
                 
-                //model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
-                
                 parkingModels.Add(model);
             }
             
@@ -111,10 +99,6 @@ namespace ParkEasyAPI.Data
             {
                 var body = client.DownloadString("https://github.com/ParkEasy/tools/releases/download/v1/uni.json");
                 jsonUni = JsonConvert.DeserializeObject(body); 
-                
-                // put data in cache
-                Cache.UniData = jsonUni;
-                Cache.UniDataExpiration = DateTime.Now.AddMinutes(30);
             }
             
             // loop university parking spaces
@@ -161,8 +145,6 @@ namespace ParkEasyAPI.Data
                 coordinateModel.Latitude = uniparking.coordinates.latitude;
                 coordinateModel.Longitude = uniparking.coordinates.longitude;
                 model.Coordinate = coordinateModel;
-                
-                //model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
                 
                 parkingModels.Add(model);
             }
