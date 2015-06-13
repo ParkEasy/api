@@ -46,6 +46,7 @@ namespace ParkEasyAPI.Controllers
                 model.Id = garage.attributes.IDENTIFIER;
                 model.Capacity = garage.attributes.KAPAZITAET;
                 model.Trend = garage.attributes.TENDENZ;
+                model.PricePerHour = 1.0;
                 
                 // parse coordinates
                 CoordinateModel coordinateModel = new CoordinateModel();
@@ -54,6 +55,8 @@ namespace ParkEasyAPI.Controllers
                 model.Coordinate = coordinateModel;
                 
                 model.Coordinates = new double[2] {coordinateModel.Longitude, coordinateModel.Latitude};
+                
+                parkingModels.Add(model);
             }
             
             // MACHINE DATA //
