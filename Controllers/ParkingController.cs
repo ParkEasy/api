@@ -186,10 +186,10 @@ namespace ParkEasyAPI.Controllers
             
             StatusModel status = new StatusModel();
             status.ParkingId = id;
-            status.Amount = amount;
+            status.Amount = amount.Value;
             status.Time= DateTime.UtcNow;
             
-            collectionSatus.Insert(status);
+            collectionStatus.Insert(status);
             
             return true;
         }
