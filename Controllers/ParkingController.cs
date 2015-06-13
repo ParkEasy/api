@@ -17,8 +17,6 @@ namespace ParkEasyAPI.Controllers
         [Route("search")]
         public dynamic Search(float lat = -1, float lon = -1, int hours = 1, double speed = 0.0)
         {
-            double START_RADIUS = 300.0;
-            double INCREMENT_RADIUS = 100.0; 
             int TAKE = 5;
             double PARKING_RADIUS = 20.0;
             double SLOW_SPEED = 3.0;
@@ -155,7 +153,7 @@ namespace ParkEasyAPI.Controllers
                     data.Add("name", model.Name);
                     data.Add("price", model.PricePerHour);
                     data.Add("type", model.Type);
-                    data.Add("coord", new List<double>(){ model.Coordinate.Latitude, model.Coordinate.Longitude });
+                    data.Add("coord", model.Coordinates);
                     
                     parking.Add(data);
                 }
