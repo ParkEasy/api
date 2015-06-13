@@ -43,6 +43,7 @@ namespace ParkEasyAPI.Controllers
             var server = StaticGlobal.MongoDBClient.GetServer();
             var database = server.GetDatabase("parkeasy");
             var collectionParking = database.GetCollection<ParkingModel>("parking");
+            var collectionStatus = database.GetCollection<StatusModel>("status");
             
             // load all parking options from mongodb
             List<ParkingModel> parkingModels = new List<ParkingModel>();
@@ -51,6 +52,21 @@ namespace ParkEasyAPI.Controllers
             var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude);
             foreach (ParkingModel model in collectionParking.Find(query).SetLimit(500)) 
             {    
+                if(model.Type != ParkingTypeEnum.Garage)
+                {
+                    var statusQuery = Query.EQ("ParkingId",model.Id);
+                    List<StatusModel> status = collectionStatus.Find(statusQuery).SetSortOrder(SortBy.Descending("Time"));
+                    
+                    if(status.Count == 0)
+                    {
+                        model.Capacity = 0;
+                    }
+                    
+                    else
+                    {
+                        model.Capacity = status[0].Amount;
+                    }
+                }
                 // calculate the distance to the user and add to working list
                 model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
                 parkingModels.Add(model);
@@ -62,6 +78,11 @@ namespace ParkEasyAPI.Controllers
             // opening hours that exceed the amount of time the user wants to park
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
             {   
+                if(a.Capacity == 0)
+                {
+                    return false;
+                }
+                
                 // are there limitations on the amount of parking hours?
                 if(a.MaximumParkingHours.HasValue) 
                 {
@@ -101,12 +122,12 @@ namespace ParkEasyAPI.Controllers
             
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
-            {
-                double dstA = a.DistanceToUser;
-                double dstB = b.DistanceToUser;
+            {   
+                double scoreA = (0.4*a.DistanceToUser) + (0.6*a.PricePerHour) ;
+                double scoreB = (0.4*b.DistanceToUser) + (0.6*b.PricePerHour) ;
                 
-                if(dstA > dstB) return 1;
-                else if(dstA < dstB) return -1;
+                if(scoreA > scoreB) return 1;
+                else if(scoreA < scoreB) return -1;
                 else return 0;
             });
             
