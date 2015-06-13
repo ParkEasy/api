@@ -169,8 +169,16 @@ namespace ParkEasyAPI.Controllers
         // https://github.com/ParkEasy/api/wiki/API-Docs#search
         [HttpGet]
         [Route("status")]
-        public dynamic Status(string id, int amount)
+        public dynamic Status(string id, int? amount)
         {
+            if(String.IsNullOrEmpty(id) || !amount.HasValue){
+                Response.StatusCode = 400;
+                
+                Dictionary<string, string> err = new Dictionary<string, string>();
+                err.Add("error", "either 'amount' or 'id' not defined as parameters");
+                
+                return err;
+            }
               // use connection to mongodb
             var server = StaticGlobal.MongoDBClient.GetServer();
             var database = server.GetDatabase("parkeasy");
