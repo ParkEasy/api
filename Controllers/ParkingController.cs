@@ -165,5 +165,25 @@ namespace ParkEasyAPI.Controllers
             
             return returnValues;
         }
+          // GET /search
+        // https://github.com/ParkEasy/api/wiki/API-Docs#search
+        [HttpGet]
+        [Route("status")]
+        public dynamic Status(string id, int amount)
+        {
+              // use connection to mongodb
+            var server = StaticGlobal.MongoDBClient.GetServer();
+            var database = server.GetDatabase("parkeasy");
+            var collectionStatus = database.GetCollection<ParkingModel>("status");
+            
+            StatusModel status = new StatusModel();
+            status.ParkingId = id;
+            status.Amount = amount;
+            status.Time= DateTime.UtcNow;
+            
+            collectionSatus.Insert(status);
+            
+            return true;
+        }
     }
 }
