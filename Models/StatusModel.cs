@@ -1,9 +1,10 @@
 using System;
+using MongoDB.Bson;
 namespace ParkEasyAPI.Models
 {	
     public class StatusModel
 	{
-		public string Id;
+		public ObjectId Id;
 		public int Amount;	
 		public string ParkingId;
 		public DateTime Time;
