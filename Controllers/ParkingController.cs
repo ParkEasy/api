@@ -52,19 +52,19 @@ namespace ParkEasyAPI.Controllers
             var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude);
             foreach (ParkingModel model in collectionParking.Find(query).SetLimit(500)) 
             {    
-                if(model.Type != ParkingTypeEnum.Garage)
+                if(model.Type != ParkingType.Garage)
                 {
                     var statusQuery = Query.EQ("ParkingId",model.Id);
-                    List<StatusModel> status = collectionStatus.Find(statusQuery).SetSortOrder(SortBy.Descending("Time"));
+                    var status = collectionStatus.Find(statusQuery).SetSortOrder(SortBy.Descending("Time"));
                     
-                    if(status.Count == 0)
+                    if(status.Count() == 0)
                     {
                         model.Capacity = 0;
                     }
                     
                     else
                     {
-                        model.Capacity = status[0].Amount;
+                        model.Capacity = status.First().Amount;
                     }
                 }
                 // calculate the distance to the user and add to working list
@@ -123,8 +123,8 @@ namespace ParkEasyAPI.Controllers
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
             {   
-                double scoreA = (0.4*a.DistanceToUser) + (0.6*a.PricePerHour) ;
-                double scoreB = (0.4*b.DistanceToUser) + (0.6*b.PricePerHour) ;
+                double scoreA = (0.4 * a.DistanceToUser) + (0.6 * a.PricePerHour.Value);
+                double scoreB = (0.4 * b.DistanceToUser) + (0.6 * b.PricePerHour.Value);
                 
                 if(scoreA > scoreB) return 1;
                 else if(scoreA < scoreB) return -1;
