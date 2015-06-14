@@ -24,37 +24,83 @@ namespace ParkEasyAPI.Controllers
 		{
             List<ParkingModel> parkingModels = new List<ParkingModel>();
             
+            // open connection to mongodb
+            var server = StaticGlobal.MongoDBClient.GetServer();
+            var database = server.GetDatabase("parkeasy");
+            var collection = database.GetCollection<ParkingModel>("parking");
+            
             // GARAGE DATA //
-            dynamic jsonGarage;
+            Dictionary<string, dynamic> jsonGarage;
             
             // load data from remote source
             Console.WriteLine("Garages from WWW");
             using(var client = new System.Net.WebClient())
             {
-                var body = client.DownloadString("http://www.stadt-koeln.de/externe-dienste/open-data/parking.php");
-                jsonGarage = JsonConvert.DeserializeObject(body);
+                var body = client.DownloadString("http://www.koeln.de/apps/parken/json/current");
+                jsonGarage = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(body);
             }
+            
+            List<string> prices = new List<string>();
                 
             // parse parking garages into our parking model
-            foreach(dynamic garage in jsonGarage.features) 
+            foreach(string key in jsonGarage.Keys) 
             {    
+                dynamic obj = jsonGarage[key];
+                
                 ParkingModel model = new ParkingModel();
                 
                 // parse garage data
                 model.Type = ParkingType.Garage;
-                model.Name = garage.attributes.PARKHAUS;
-                model.Id = garage.attributes.IDENTIFIER;
-                model.Capacity = garage.attributes.KAPAZITAET;
-                model.Trend = garage.attributes.TENDENZ;
+                model.Name = obj.title;
+                model.Id = obj.shortname;
+                model.Capacity = obj.capacity;
+                
+                try
+                {
+                    model.CapacityWomen = obj.womens_parking;
+                }
+                catch(Exception e) {}
+                
                 model.PricePerHour = 1.0;
+                model.Description = obj.fulltext;
+                
+                var collectionStatus = database.GetCollection<ParkingModel>("status");
+            
+                // store the "free" parking spaces information
+                StatusModel status = new StatusModel();
+                status.ParkingId = model.Id;
+                status.Amount = obj.free;
+                status.Time = DateTime.UtcNow;
+                status.Id = ObjectId.GenerateNewId();
+                
+                collectionStatus.Insert(status);
                 
                 // parse coordinates
                 CoordinateModel coordinateModel = new CoordinateModel();
-                coordinateModel.Latitude = garage.geometry.y;
-                coordinateModel.Longitude = garage.geometry.x;
-                model.Coordinate = coordinateModel;
+                coordinateModel.Latitude = Convert.ToDouble(obj.lat);
+                coordinateModel.Longitude = Convert.ToDouble(obj.lon);
                 
+                model.Coordinate = coordinateModel;
                 model.Coordinates = new double[2] {coordinateModel.Longitude, coordinateModel.Latitude};
+                
+                try 
+                {
+                    model.OpeningHours = new OpeningHoursModel[7];
+                    
+                    // loop a whole week
+                    for(int i = 0; i <= 6; i++)
+                    {
+                        // extract opening times for every day of the week
+                        OpeningHoursModel hoursModel = new OpeningHoursModel();
+                        hoursModel.Open = Convert.ToInt32(Convert.ToString(obj.open_time).Replace(":", ""));
+                        hoursModel.Close = Convert.ToInt32(Convert.ToString(obj.close_time).Replace(":", ""));
+                        
+                        model.OpeningHours[i] = hoursModel;
+                    }
+                }
+                catch(Exception e) {
+                    Console.WriteLine(e.ToString());
+                }
                 
                 parkingModels.Add(model);
             }
@@ -158,11 +204,6 @@ namespace ParkEasyAPI.Controllers
                 
                 parkingModels.Add(model);
             }
-            
-            // open connection to mongodb
-            var server = StaticGlobal.MongoDBClient.GetServer();
-            var database = server.GetDatabase("parkeasy");
-            var collection = database.GetCollection<ParkingModel>("parking");
             
             // upsert each of the available parking options
             foreach(ParkingModel model in parkingModels)

@@ -51,22 +51,32 @@ namespace ParkEasyAPI.Controllers
             // fetch all parking options sorted by nearest
             var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude);
             foreach (ParkingModel model in collectionParking.Find(query).SetLimit(500)) 
-            {    
-                if(model.Type != ParkingType.Garage)
+            {   
+                // query the status table to retreive the current status of free/available 
+                // parking spots 
+                var statusQuery = Query.EQ("ParkingId",model.Id);
+                var status = collectionStatus.Find(statusQuery).SetSortOrder(SortBy.Descending("Time")).SetLimit(1);
+                
+                // no information yet? set the likelihood of a free parking space to 50%
+                if(status.Count() == 0 || model.Capacity.HasValue == false)
                 {
-                    var statusQuery = Query.EQ("ParkingId",model.Id);
-                    var status = collectionStatus.Find(statusQuery).SetSortOrder(SortBy.Descending("Time"));
-                    
-                    if(status.Count() == 0)
+                    model.FreeLikelihood = 0.5;
+                }
+                
+                // if there are information on the current status of free parking spots,
+                // set the likelihood to the amount of free spots devided by the capacity
+                else
+                {
+                    if(model.Capacity.Value == 0) 
                     {
-                        model.Capacity = 0;
+                        model.FreeLikelihood = 0.5;   
                     }
-                    
-                    else
+                    else 
                     {
-                        model.Capacity = status.First().Amount;
+                        model.FreeLikelihood = Convert.ToDouble(status.First().Amount) / Convert.ToDouble(model.Capacity.Value);
                     }
                 }
+                
                 // calculate the distance to the user and add to working list
                 model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
                 parkingModels.Add(model);
@@ -78,7 +88,7 @@ namespace ParkEasyAPI.Controllers
             // opening hours that exceed the amount of time the user wants to park
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
             {   
-                if(a.Capacity == 0)
+                if(a.FreeLikelihood == 0.0)
                 {
                     return false;
                 }
@@ -120,6 +130,22 @@ namespace ParkEasyAPI.Controllers
             
             Console.WriteLine("{0} parking options that are open/available", parkingModels.Count);
             
+            // dictionary to store return values that translate to JSON
+            Dictionary<string, object> returnValues = new Dictionary<string, object>();
+            
+            // there are no available parking options in the area
+            if(parkingModels.Count == 0)
+            {   
+                // set appropriate state
+                returnValues.Add("state", "driving");
+                returnValues.Add("parking", parkingModels);
+                return returnValues;
+            }
+            
+            // store the current first one in the list since it will be the closest
+            // due to mongodb's geosearch
+            ParkingModel closestModel = parkingModels.First();
+            
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
             {   
@@ -131,29 +157,22 @@ namespace ParkEasyAPI.Controllers
                 else return 0;
             });
             
-            // dictionary to store return values that translate to JSON
-            Dictionary<string, object> returnValues = new Dictionary<string, object>();
-            
             // check if a user is right on the closest parkingspot,
             // that would mean, that the STATE 'parked' would be induced
-            if(parkingModels.First().DistanceToUser <= PARKING_RADIUS / 1000.0 && speed <= SLOW_SPEED)
-            {
-                // the first parking spot in the - by distance - sorted list will
-                // be the closest
-                ParkingModel model = parkingModels.First();
-                
+            if(closestModel.DistanceToUser <= PARKING_RADIUS / 1000.0 && speed <= SLOW_SPEED)
+            {   
                 // set appropriate state
                 returnValues.Add("state", "parking");
-                returnValues.Add("distance", Math.Round(model.DistanceToUser, 2));
+                returnValues.Add("distance", Math.Round(closestModel.DistanceToUser, 2));
                 
                 // append information about the parking spot we are on right now
                 Dictionary<string, object> data = new Dictionary<string, object>();
-                data.Add("id", model.Id);
-                data.Add("name", model.Name);
-                data.Add("price", model.PricePerHour);
-                data.Add("type", model.Type);
-                data.Add("redpoint", model.RedPointText);
-                data.Add("description", model.Description);
+                data.Add("id", closestModel.Id);
+                data.Add("name", closestModel.Name);
+                data.Add("price", closestModel.PricePerHour);
+                data.Add("type", closestModel.Type);
+                data.Add("redpoint", closestModel.RedPointText);
+                data.Add("description", closestModel.Description);
                 
                 returnValues.Add("parking", data);
             }
@@ -175,6 +194,7 @@ namespace ParkEasyAPI.Controllers
                     data.Add("price", model.PricePerHour);
                     data.Add("type", model.Type);
                     data.Add("coord", model.Coordinates);
+                    data.Add("free", model.FreeLikelihood);
                     
                     parking.Add(data);
                 }
