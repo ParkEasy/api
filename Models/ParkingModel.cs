@@ -13,7 +13,7 @@ namespace ParkEasyAPI.Models
 		public int? CapacityDisabled; // free spaces for disabled humans
 		public int? CapacityService; // free spaces for Dienstfahrzeuge 
 		public double FreeLikelihood;
-		public double? PricePerHour;
+		public PriceModel Price;
 		public double? MaximumParkingHours;
 		public string RedPointText; // some payment stuff
 		public string SectionFrom;

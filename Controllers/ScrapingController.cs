@@ -61,7 +61,7 @@ namespace ParkEasyAPI.Controllers
                 }
                 catch(Exception e) {}
                 
-                model.PricePerHour = 1.0;
+                model.Price = new PriceModel(1.0);
                 model.Description = obj.fulltext;
                 
                 var collectionStatus = database.GetCollection<ParkingModel>("status");
@@ -127,7 +127,7 @@ namespace ParkEasyAPI.Controllers
                 model.Name = machine.attributes.Aufstellort;
                 model.Id = Convert.ToString(machine.attributes.ID);
                 model.Capacity = machine.attributes.Stellplaetze;
-                model.PricePerHour = Convert.ToDouble(machine.attributes.Gebuehr);
+                model.Price = new PriceModel(Convert.ToDouble(machine.attributes.Gebuehr));
                 model.MaximumParkingHours = Convert.ToDouble(machine.attributes.Hoechstparkdauer);
                 model.RedPointText = machine.attributes.Roter_Punkt_Text;
                 model.SectionFrom = machine.attributes.Abschnitt_Von;
@@ -168,7 +168,7 @@ namespace ParkEasyAPI.Controllers
                 model.CapacityDisabled = uniparking.num_disabled;
                 model.CapacityService = uniparking.num_service;
                 model.Gates = uniparking.gates;
-                model.PricePerHour = 1.3;
+                model.Price = new PriceModel(1.3);
                 
                 // parse opening hours
                 if(DynamicExist(uniparking, "hours")) 

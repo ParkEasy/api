@@ -1,5 +1,6 @@
 using System;
 using MongoDB.Bson;
+
 namespace ParkEasyAPI.Models
 {	
     public class StatusModel
@@ -7,8 +8,6 @@ namespace ParkEasyAPI.Models
 		public ObjectId Id;
 		public int Amount;	
 		public string ParkingId;
-		public DateTime Time;
-		
+		public DateTime Time;	
 	}
-	
 }

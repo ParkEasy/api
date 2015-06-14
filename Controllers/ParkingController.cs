@@ -149,8 +149,8 @@ namespace ParkEasyAPI.Controllers
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
             {   
-                double scoreA = (0.4 * a.DistanceToUser) + (0.6 * a.PricePerHour.Value);
-                double scoreB = (0.4 * b.DistanceToUser) + (0.6 * b.PricePerHour.Value);
+                double scoreA = (0.4 * a.DistanceToUser) + (0.6 * a.Price.PerHour.Price);
+                double scoreB = (0.4 * b.DistanceToUser) + (0.6 * b.Price.PerHour.Price);
                 
                 if(scoreA > scoreB) return 1;
                 else if(scoreA < scoreB) return -1;
@@ -169,7 +169,7 @@ namespace ParkEasyAPI.Controllers
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 data.Add("id", closestModel.Id);
                 data.Add("name", closestModel.Name);
-                data.Add("price", closestModel.PricePerHour);
+                data.Add("price", closestModel.Price.PerHour.Price);
                 data.Add("type", closestModel.Type);
                 data.Add("redpoint", closestModel.RedPointText);
                 data.Add("description", closestModel.Description);
@@ -191,7 +191,7 @@ namespace ParkEasyAPI.Controllers
                     Dictionary<string, object> data = new Dictionary<string, object>();
                     data.Add("id", model.Id);
                     data.Add("name", model.Name);
-                    data.Add("price", model.PricePerHour);
+                    data.Add("price", model.Price.PerHour.Price);
                     data.Add("type", model.Type);
                     data.Add("coord", model.Coordinates);
                     data.Add("free", model.FreeLikelihood);

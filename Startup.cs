@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Diagnostics;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.DependencyInjection;
 using MongoDB.Driver;
@@ -46,6 +47,12 @@ namespace ParkEasyAPI
             app.UseMvc();
             // Add the following route for porting Web API 2 controllers.
             // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
+            
+            // Show Error Messages
+            if(String.IsNullOrEmpty(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb")))
+            {
+                app.UseErrorPage(ErrorPageOptions.ShowAll);
+            }
         }
     }
 }
