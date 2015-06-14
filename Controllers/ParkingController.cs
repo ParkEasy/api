@@ -52,13 +52,8 @@ namespace ParkEasyAPI.Controllers
             var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude);
             foreach (ParkingModel model in collectionParking.Find(query).SetLimit(500)) 
             {   
-                // query the status table to retreive the current status of free/available 
-                // parking spots 
-                var statusQuery = Query.EQ("ParkingId",model.Id);
-                var status = collectionStatus.Find(statusQuery).SetSortOrder(SortBy.Descending("Time")).SetLimit(1);
-                
                 // no information yet? set the likelihood of a free parking space to 50%
-                if(status.Count() == 0 || model.Capacity.HasValue == false)
+                if(model.Free < 0)
                 {
                     model.FreeLikelihood = 0.5;
                 }
@@ -67,18 +62,12 @@ namespace ParkEasyAPI.Controllers
                 // set the likelihood to the amount of free spots devided by the capacity
                 else
                 {
-                    if(model.Capacity.Value == 0) 
-                    {
-                        model.FreeLikelihood = 0.5;   
-                    }
-                    else 
-                    {
-                        model.FreeLikelihood = Convert.ToDouble(status.First().Amount) / Convert.ToDouble(model.Capacity.Value);
-                    }
+                    model.FreeLikelihood = Convert.ToDouble(model.Free) / Convert.ToDouble(model.Capacity.Value);
                 }
                 
                 // calculate the distance to the user and add to working list
                 model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                
                 parkingModels.Add(model);
             }
             
@@ -223,7 +212,8 @@ namespace ParkEasyAPI.Controllers
               // use connection to mongodb
             var server = StaticGlobal.MongoDBClient.GetServer();
             var database = server.GetDatabase("parkeasy");
-            var collectionStatus = database.GetCollection<ParkingModel>("status");
+            var collectionStatus = database.GetCollection<StatusModel>("status");
+            var collectionParking = database.GetCollection<ParkingModel>("parking");
             
             StatusModel status = new StatusModel();
             status.ParkingId = id;
@@ -232,6 +222,17 @@ namespace ParkEasyAPI.Controllers
             status.Id = ObjectId.GenerateNewId();
             
             collectionStatus.Insert(status);
+            
+            // update the parking document to for denormalization purposes
+            var query = new QueryDocument {
+                { "_id", id }
+            };
+            
+            var update = new UpdateDocument {
+                { "$set", new BsonDocument("Free", amount.Value) }
+            };
+            
+            collectionParking.Update(query, update);
             
             return true;
         }

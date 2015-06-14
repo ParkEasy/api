@@ -54,6 +54,7 @@ namespace ParkEasyAPI.Controllers
                 model.Name = obj.title;
                 model.Id = obj.shortname;
                 model.Capacity = obj.capacity;
+                model.Free = obj.free;
                 
                 try
                 {

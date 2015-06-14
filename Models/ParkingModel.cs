@@ -12,6 +12,7 @@ namespace ParkEasyAPI.Models
 		public int? CapacityWomen; // free spaces especially for women
 		public int? CapacityDisabled; // free spaces for disabled humans
 		public int? CapacityService; // free spaces for Dienstfahrzeuge 
+		public int Free;
 		public double FreeLikelihood;
 		public PriceModel Price;
 		public double? MaximumParkingHours;
@@ -26,6 +27,7 @@ namespace ParkEasyAPI.Models
 			this.Gates = false;
 			this.Coordinates = new double[2];
 			this.FreeLikelihood = 0.0;
+			this.Free = -1;
 		}
 	}
 	
