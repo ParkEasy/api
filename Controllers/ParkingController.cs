@@ -106,7 +106,7 @@ namespace ParkEasyAPI.Controllers
                     }
                     
                     // check if current time + parking duration in limits of opening hours
-                    int parkingDurationAbsolute = Int32.Parse(string.Format("hmm", DateTime.Now.AddHours(hours)));
+                    int parkingDurationAbsolute = Convert.ToInt32(string.Format("{0:HHmm}", DateTime.Now.AddHours(hours)));
                     if(openingModel.Open > parkingDurationAbsolute && parkingDurationAbsolute > openingModel.Close)
                     {
                         return false;
