@@ -23,7 +23,7 @@ namespace ParkEasyAPI
             }
             else 
             {
-                StaticGlobal.MongoDBClient = new MongoClient("mongodb://readonly:readonly@ds036178.mongolab.com:36178/parkeasy");
+                StaticGlobal.MongoDBClient = new MongoClient("mongodb://parking:no5lebt@ds036178.mongolab.com:36178/parkeasy");
             }
         }
 
@@ -49,10 +49,7 @@ namespace ParkEasyAPI
             // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             
             // Show Error Messages
-            if(String.IsNullOrEmpty(Environment.GetEnvironmentVariable("CUSTOMCONNSTR_mongodb")))
-            {
-                app.UseErrorPage(ErrorPageOptions.ShowAll);
-            }
+            app.UseErrorPage(ErrorPageOptions.ShowAll);  
         }
     }
 }

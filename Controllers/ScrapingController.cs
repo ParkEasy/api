@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
 using ParkEasyAPI.Models;
+using ParkEasyAPI.Parser;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -62,7 +63,15 @@ namespace ParkEasyAPI.Controllers
                 }
                 catch(Exception e) {}
                 
-                model.Price = new PriceModel(1.0);
+                try
+                {
+                    model.Price = PriceParser.Parse(Convert.ToString(obj.price));
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+                
                 model.Description = obj.fulltext;
                 
                 var collectionStatus = database.GetCollection<ParkingModel>("status");

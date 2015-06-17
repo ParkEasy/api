@@ -10,6 +10,10 @@ namespace ParkEasyAPI.Models
 		public List<TierModel> Tiered;
 		public TierModel SpecialHours;
 		
+		public PriceModel()
+		{
+		}
+		
 		public PriceModel(double PerHourPrice, double FullDayPrice)
 		{
 			this.FullDay = FullDayPrice;
