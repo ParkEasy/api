@@ -197,8 +197,8 @@ namespace ParkEasyAPI.Controllers
             
             return returnValues;
         }
-          // GET /search
-        // https://github.com/ParkEasy/api/wiki/API-Docs#search
+          // GET /status
+        // https://github.com/ParkEasy/api/wiki/API-Docs#status
         [HttpGet]
         [Route("status")]
         public dynamic Status(string id, int? amount)
