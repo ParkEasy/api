@@ -17,6 +17,7 @@ namespace ParkEasyAPI.Controllers
         [Route("search")]
         public dynamic Search(float lat = -1, float lon = -1, int hours = 1, double speed = 0.0)
         {
+            // constant parameters
             int TAKE = 5;
             double PARKING_RADIUS = 20.0;
             double SLOW_SPEED = 3.0;
