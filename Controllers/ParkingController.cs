@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
 using ParkEasyAPI.Models;
+using ParkEasyAPI.Parser;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -139,8 +140,8 @@ namespace ParkEasyAPI.Controllers
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
             {   
-                double scoreA = (0.4 * a.DistanceToUser) + (0.6 * a.Price.PerHour.Price);
-                double scoreB = (0.4 * b.DistanceToUser) + (0.6 * b.Price.PerHour.Price);
+                double scoreA = (0.4 * a.DistanceToUser) + (0.6 * PriceParser.Interpret(a.Price, hours));
+                double scoreB = (0.4 * b.DistanceToUser) + (0.6 * PriceParser.Interpret(b.Price, hours));
                 
                 if(scoreA > scoreB) return 1;
                 else if(scoreA < scoreB) return -1;
