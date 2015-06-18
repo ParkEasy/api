@@ -89,7 +89,7 @@ namespace ParkEasyAPI.Controllers
                 // parse coordinates
                 CoordinateModel coordinateModel = new CoordinateModel();
                 coordinateModel.Latitude = Convert.ToDouble(obj.lat);
-                coordinateModel.Longitude = Convert.ToDouble(obj.lon);
+                coordinateModel.Longitude = Convert.ToDouble(obj.lng);
                 
                 model.Coordinate = coordinateModel;
                 model.Coordinates = new double[2] {coordinateModel.Longitude, coordinateModel.Latitude};
