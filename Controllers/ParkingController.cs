@@ -13,6 +13,68 @@ namespace ParkEasyAPI.Controllers
 {   
     public class ParkingController : Controller
     {   
+        // GET /all
+        [HttpGet]
+        [Route("all")]
+        public dynamic All()
+        {
+            // use connection to mongodb
+            var server = StaticGlobal.MongoDBClient.GetServer();
+            var database = server.GetDatabase("parkeasy");
+            var collectionParking = database.GetCollection<ParkingModel>("parking");
+            
+            dynamic geojson = new Dictionary<string, Object>();
+            
+            try
+            {
+                geojson["type"] = "FeatureCollection";
+                geojson["features"] = new List<dynamic>();
+       
+                foreach(ParkingModel parking in collectionParking.FindAll().SetFields(new string[]{"Name", "Free", "Coordinates", "Type", "Capacity"}))
+                {
+                    dynamic feature = new Dictionary<string, Object>();
+                    feature["type"] = "Feature";
+                    
+                    feature["geometry"] = new Dictionary<string, Object>();
+                    feature["geometry"]["type"] = "Point";
+                    feature["geometry"]["coordinates"] = parking.Coordinates;
+                    
+                    feature["properties"] = new Dictionary<string, Object>();
+                    feature["properties"]["title"] = parking.Name;
+                    feature["properties"]["description"] = parking.Capacity + " Plätze";
+                    feature["properties"]["marker-size"] = "large";
+                    
+                    switch(parking.Type)
+                    {
+                        case ParkingType.Garage:
+                            
+                            feature["properties"]["marker-symbol"] = "parking";
+                            feature["properties"]["marker-color"] = "#e74c3c";
+                            break;
+                            
+                       case ParkingType.TicketMachine:
+                       
+                            feature["properties"]["marker-color"] = "#3498db";
+                            feature["properties"]["marker-symbol"] = "parking";
+                            break;
+                            
+                       case ParkingType.University:
+                            feature["properties"]["marker-symbol"] = "parking";
+                            feature["properties"]["marker-color"] = "#9b59b6";
+                            break;
+                    }
+                    
+                    geojson["features"].Add(feature);
+                }
+            }
+            catch(Exception e)
+            {
+                return e;
+            }
+            
+            return geojson;
+        }
+        
         // GET /search
         // https://github.com/ParkEasy/api/wiki/API-Docs#search
         [HttpGet]
