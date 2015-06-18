@@ -9,5 +9,6 @@ namespace ParkEasyAPI.Models
 		public int Amount;	
 		public string ParkingId;
 		public DateTime Time;	
+		public bool HighQualitySample;
 	}
 }

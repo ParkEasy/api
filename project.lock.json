@@ -10,7 +10,8 @@
       "Microsoft.AspNet.Diagnostics >= 1.0.0-beta4",
       "Kestrel >= 1.0.0-beta4",
       "Newtonsoft.Json >= 6.0.8",
-      "mongocsharpdriver >= 2.0.1"
+      "mongocsharpdriver >= 2.0.1",
+      "WilsonScore >= 2.0.1"
     ],
     "DNX,Version=v4.5.1": [],
     "DNXCore,Version=v5.0": []
@@ -5881,6 +5882,35 @@
         "lib/contract/System.Xml.XDocument.dll",
         "lib/net45/System.Xml.XDocument.dll",
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Xml.XDocument.dll"
+      ]
+    },
+    "WilsonScore/2.0.1": {
+      "serviceable": false,
+      "sha": "6ZFCEn91w2sJjqJgWAqBUyVutsPr1O4NyRtgEMVZ15evQHO4ZF1qKfQigY8Eo4+ARe7kl0VDR0nO9Fi97WLQqQ==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-net40+sl50+win+wpa81+wp80+MonoAndroid10+MonoTouch10/WilsonScore.dll"
+          ],
+          "compileAssemblies": [
+            "lib/portable-net40+sl50+win+wpa81+wp80+MonoAndroid10+MonoTouch10/WilsonScore.dll"
+          ]
+        },
+        "DNXCore,Version=v5.0": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        }
+      },
+      "files": [
+        "WilsonScore.2.0.1.nupkg",
+        "WilsonScore.2.0.1.nupkg.sha512",
+        "WilsonScore.nuspec",
+        "lib/portable-net40+sl50+win+wpa81+wp80+MonoAndroid10+MonoTouch10/WilsonScore.dll",
+        "src/Wilson.cs"
       ]
     }
   }

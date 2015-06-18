@@ -82,6 +82,7 @@ namespace ParkEasyAPI.Controllers
                 status.Amount = obj.free;
                 status.Time = DateTime.UtcNow;
                 status.Id = ObjectId.GenerateNewId();
+                status.HighQualitySample = true;
                 
                 collectionStatus.Insert(status);
                 

@@ -7,6 +7,7 @@ using ParkEasyAPI.Parser;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using WilsonScore;
 
 namespace ParkEasyAPI.Controllers
 {   
@@ -64,7 +65,16 @@ namespace ParkEasyAPI.Controllers
                 // set the likelihood to the amount of free spots devided by the capacity
                 else
                 {
-                    model.FreeLikelihood = Convert.ToDouble(model.Free) / Convert.ToDouble(model.Capacity.Value);
+                    if(model.Type == ParkingType.Garage) 
+                    {
+                        if(model.Free == 0) model.FreeLikelihood = 0.0;
+                        else if(model.Free == 1) model.FreeLikelihood = 0.05;
+                        else if(model.Free == 2) model.FreeLikelihood = 0.10;
+                        else if(model.Free == 3) model.FreeLikelihood = 0.15;
+                  
+                        else model.FreeLikelihood = 1.0;
+                    }
+                    //model.FreeLikelihood = Convert.ToDouble(model.Free) / Convert.ToDouble(model.Capacity.Value);
                 }
                 
                 // calculate the distance to the user and add to working list
@@ -140,8 +150,8 @@ namespace ParkEasyAPI.Controllers
             // sort by closeness to current position
             parkingModels.Sort(delegate(ParkingModel a, ParkingModel b)
             {   
-                double scoreA = (0.4 * a.DistanceToUser) + (0.6 * PriceParser.Interpret(a.Price, hours));
-                double scoreB = (0.4 * b.DistanceToUser) + (0.6 * PriceParser.Interpret(b.Price, hours));
+                double scoreA = a.DistanceToUser * PriceParser.Interpret(a.Price, hours) * a.FreeLikelihood;
+                double scoreB = b.DistanceToUser * PriceParser.Interpret(b.Price, hours) * b.FreeLikelihood;
                 
                 if(scoreA > scoreB) return 1;
                 else if(scoreA < scoreB) return -1;
@@ -201,9 +211,10 @@ namespace ParkEasyAPI.Controllers
         // https://github.com/ParkEasy/api/wiki/API-Docs#status
         [HttpGet]
         [Route("status")]
-        public dynamic Status(string id, int? amount)
+        public dynamic Status(string id, int? amount, bool hq = false)
         {
-            if(String.IsNullOrEmpty(id) || !amount.HasValue){
+            if(String.IsNullOrEmpty(id) || !amount.HasValue)
+            {
                 Response.StatusCode = 400;
                 
                 Dictionary<string, string> err = new Dictionary<string, string>();
@@ -222,8 +233,30 @@ namespace ParkEasyAPI.Controllers
             status.Amount = amount.Value;
             status.Time = DateTime.UtcNow;
             status.Id = ObjectId.GenerateNewId();
+            status.HighQualitySample = hq;
             
             collectionStatus.Insert(status);
+            
+            // count up and downvotes
+            var queryStati = new QueryDocument {
+                { "ParkingId", id }
+            };
+            
+            int upvotes = 0;
+            int total = 0;
+            foreach (StatusModel stati in collectionStatus.Find(queryStati)) 
+            {
+                if(stati.HighQualitySample == false)
+                {
+                    if(stati.Amount > 0) {
+                        upvotes++;
+                    }
+                    
+                    total++;
+                }
+            }
+            
+            double ws = Wilson.Score(upvotes, total);
             
             // update the parking document to for denormalization purposes
             var query = new QueryDocument {
@@ -231,7 +264,7 @@ namespace ParkEasyAPI.Controllers
             };
             
             var update = new UpdateDocument {
-                { "$set", new BsonDocument("Free", amount.Value) }
+                { "$set", new BsonDocument("FreeLikelihood", ws) }
             };
             
             collectionParking.Update(query, update);
