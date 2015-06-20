@@ -18,6 +18,8 @@ namespace ParkEasyAPI.Controllers
         [Route("all")]
         public dynamic All()
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", new string[]{"*"});
+            
             // use connection to mongodb
             var server = StaticGlobal.MongoDBClient.GetServer();
             var database = server.GetDatabase("parkeasy");
@@ -81,6 +83,8 @@ namespace ParkEasyAPI.Controllers
         [Route("search")]
         public dynamic Search(float lat = -1, float lon = -1, int hours = 1, double speed = 0.0)
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", new string[]{"*"});
+            
             // constant parameters
             int TAKE = 5;
             double PARKING_RADIUS = 20.0;
@@ -275,6 +279,8 @@ namespace ParkEasyAPI.Controllers
         [Route("status")]
         public dynamic Status(string id, int? amount, bool hq = false)
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", new string[]{"*"});
+            
             if(String.IsNullOrEmpty(id) || !amount.HasValue)
             {
                 Response.StatusCode = 400;
