@@ -155,7 +155,7 @@ namespace ParkEasyAPI.Controllers
             // opening hours that exceed the amount of time the user wants to park
             parkingModels = parkingModels.Where(delegate(ParkingModel a)
             {   
-                if(a.FreeLikelihood == 0.0)
+                if(a.FreeLikelihood == 0.0 || a.Price == null)
                 {
                     return false;
                 }
