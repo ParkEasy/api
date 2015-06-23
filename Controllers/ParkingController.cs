@@ -77,6 +77,21 @@ namespace ParkEasyAPI.Controllers
             return geojson;
         }
         
+        // GET /detail
+        [HttpGet]
+        [Route("detail")]
+        public dynamic Detail(string id)
+        {
+            Response.Headers.Add("Access-Control-Allow-Origin", new string[]{"*"});
+            
+            // use connection to mongodb
+            var server = StaticGlobal.MongoDBClient.GetServer();
+            var database = server.GetDatabase("parkeasy");
+            var collectionParking = database.GetCollection<ParkingModel>("parking");
+            
+            return collectionParking.FindOneById(id);
+        }
+        
         // GET /search
         // https://github.com/ParkEasy/api/wiki/API-Docs#search
         [HttpGet]
