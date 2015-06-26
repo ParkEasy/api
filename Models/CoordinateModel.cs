@@ -18,7 +18,7 @@ namespace ParkEasyAPI.Models
 			);*/
 			
 			// manhattan distance
-			double dist = Math.Abs(this.Latitude - coordinate.Latitude) + Math.Abs(this.Longitude - coordinate.Longitude);
+			double dst = Math.Abs(this.Latitude - coordinate.Latitude) + Math.Abs(this.Longitude - coordinate.Longitude);
 			return Math.Abs(dst) * 6371 / 1000;
 		}
 	}
