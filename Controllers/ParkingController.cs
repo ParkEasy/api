@@ -133,7 +133,7 @@ namespace ParkEasyAPI.Controllers
             List<ParkingModel> parkingModels = new List<ParkingModel>();
            
             // fetch all parking options sorted by nearest
-            var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude, 0.8/111.12);
+            var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude, 0.65/111.12);
             foreach (ParkingModel model in collectionParking.Find(query).SetLimit(500)) 
             {   
                 // no information yet? set the likelihood of a free parking space to 50%
