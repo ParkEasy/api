@@ -102,7 +102,7 @@ namespace ParkEasyAPI.Controllers
             
             // constant parameters
             int TAKE = 5;
-            double PARKING_RADIUS = 20.0;
+            double PARKING_RADIUS = 5.0;
             double SLOW_SPEED = 3.0;
             
             // validity check: are lat and lon specified?
@@ -270,6 +270,8 @@ namespace ParkEasyAPI.Controllers
                 // append good parking options around user
                 foreach(ParkingModel model in parkingModels.Take(TAKE))
                 {
+                    Console.WriteLine(PriceParser.Interpret(model.Price, hours));
+                    
                     Dictionary<string, object> data = new Dictionary<string, object>();
                     data.Add("id", model.Id);
                     data.Add("name", model.Name);
