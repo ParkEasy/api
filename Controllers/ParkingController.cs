@@ -273,7 +273,7 @@ namespace ParkEasyAPI.Controllers
                     Dictionary<string, object> data = new Dictionary<string, object>();
                     data.Add("id", model.Id);
                     data.Add("name", model.Name);
-                    data.Add("price", model.Price.PerHour.Price);
+                    data.Add("price", PriceParser.Interpret(model.Price, hours));
                     data.Add("type", model.Type);
                     data.Add("coord", model.Coordinates);
                     data.Add("free", model.FreeLikelihood);
