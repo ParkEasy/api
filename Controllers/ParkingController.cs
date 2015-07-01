@@ -45,7 +45,7 @@ namespace ParkEasyAPI.Controllers
                     
                     feature["properties"] = new Dictionary<string, Object>();
                     feature["properties"]["title"] = parking.Name;
-                    feature["properties"]["description"] = parking.Capacity + " Plätze<br>Wahrsch. freier Parkpl.: " + Math.Round(parking.FreeLikelihood);
+                    feature["properties"]["description"] = parking.Capacity + " Plätze<br>Wahrsch. freier Parkpl.: " + Math.Round(parking.FreeLikelihood*100);
                     feature["properties"]["marker-size"] = "large";
                     
                     switch(parking.Type)
