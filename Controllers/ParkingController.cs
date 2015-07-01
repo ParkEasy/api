@@ -140,7 +140,7 @@ namespace ParkEasyAPI.Controllers
             osrmTableQueryBuilder.AppendFormat("loc={0},{1}&", Math.Round(lat, 5), Math.Round(lon, 5));
            
             // fetch all parking options sorted by nearest
-            var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude, 0.65/111.12);
+            var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude, 1.5/111.12);
             foreach (ParkingModel model in collectionParking.Find(query).SetLimit(100)) 
             {   
                 model.CalcFreeLikelihood();
