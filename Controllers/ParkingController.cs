@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.Mvc;
@@ -8,6 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using WilsonScore;
+using Newtonsoft.Json;
 
 namespace ParkEasyAPI.Controllers
 {   
@@ -134,16 +136,47 @@ namespace ParkEasyAPI.Controllers
             // load all parking options from mongodb
             List<ParkingModel> parkingModels = new List<ParkingModel>();
            
+            StringBuilder osrmTableQueryBuilder = new StringBuilder("http://router.project-osrm.org/table?");
+            osrmTableQueryBuilder.AppendFormat("loc={0},{1}&", Math.Round(lat, 5), Math.Round(lon, 5));
+           
             // fetch all parking options sorted by nearest
             var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude, 0.65/111.12);
-            foreach (ParkingModel model in collectionParking.Find(query).SetLimit(500)) 
+            foreach (ParkingModel model in collectionParking.Find(query).SetLimit(100)) 
             {   
                 model.CalcFreeLikelihood();
                 
                 // calculate the distance to the user and add to working list
-                model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                //model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);
+                osrmTableQueryBuilder.AppendFormat("loc={0},{1}&", Math.Round(model.Coordinate.Latitude, 5), Math.Round(model.Coordinate.Longitude, 5));
                 
                 parkingModels.Add(model);
+            }
+            
+            String osrmTableQuery = osrmTableQueryBuilder.ToString();
+            osrmTableQuery = osrmTableQuery.Remove(osrmTableQuery.Length - 1);
+            
+            // query osrm for distance table
+            using (var client = new System.Net.WebClient())
+            {
+                client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-GB; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12");
+                client.Headers.Add("Accept", "*/*");
+                
+                String body = client.DownloadString(osrmTableQuery);
+                dynamic table = JsonConvert.DeserializeObject(body); 
+                
+                int i = 0;
+                foreach(int distance in table.distance_table[0]) 
+                {
+                    if(i == 0) 
+                    {
+                        i++;
+                        continue;
+                    }
+                    
+                    Console.WriteLine(distance);
+                    parkingModels.ElementAt(i - 1).DistanceToUser = Convert.ToDouble(distance);
+                    i++;
+                }
             }
             
             Console.WriteLine("{0} parking options", parkingModels.Count);
