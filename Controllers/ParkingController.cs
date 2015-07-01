@@ -34,6 +34,8 @@ namespace ParkEasyAPI.Controllers
        
                 foreach(ParkingModel parking in collectionParking.FindAll().SetFields(new string[]{"Name", "Free", "Coordinates", "Type", "Capacity"}))
                 {
+                    parking.CalcFreeLikelihood();
+                    
                     dynamic feature = new Dictionary<string, Object>();
                     feature["type"] = "Feature";
                     
@@ -43,7 +45,7 @@ namespace ParkEasyAPI.Controllers
                     
                     feature["properties"] = new Dictionary<string, Object>();
                     feature["properties"]["title"] = parking.Name;
-                    feature["properties"]["description"] = parking.Capacity + " Plätze";
+                    feature["properties"]["description"] = parking.Capacity + " Plätze<br>Wahrsch. freier Parkpl.: " + Math.Round(parking.FreeLikelihood);
                     feature["properties"]["marker-size"] = "large";
                     
                     switch(parking.Type)
@@ -136,27 +138,7 @@ namespace ParkEasyAPI.Controllers
             var query = Query.Near("Coordinates", currentPosition.Longitude, currentPosition.Latitude, 0.65/111.12);
             foreach (ParkingModel model in collectionParking.Find(query).SetLimit(500)) 
             {   
-                // no information yet? set the likelihood of a free parking space to 50%
-                if(model.Free < 0)
-                {
-                    model.FreeLikelihood = 0.5;
-                }
-                
-                // if there are information on the current status of free parking spots,
-                // set the likelihood to the amount of free spots devided by the capacity
-                else
-                {
-                    if(model.Type == ParkingType.Garage) 
-                    {
-                        if(model.Free == 0) model.FreeLikelihood = 0.0;
-                        else if(model.Free == 1) model.FreeLikelihood = 0.05;
-                        else if(model.Free == 2) model.FreeLikelihood = 0.10;
-                        else if(model.Free == 3) model.FreeLikelihood = 0.15;
-                  
-                        else model.FreeLikelihood = 1.0;
-                    }
-                    //model.FreeLikelihood = Convert.ToDouble(model.Free) / Convert.ToDouble(model.Capacity.Value);
-                }
+                model.CalcFreeLikelihood();
                 
                 // calculate the distance to the user and add to working list
                 model.DistanceToUser = model.Coordinate.DistanceTo(currentPosition);

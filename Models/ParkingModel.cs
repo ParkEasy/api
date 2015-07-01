@@ -29,6 +29,30 @@ namespace ParkEasyAPI.Models
 			this.FreeLikelihood = 0.0;
 			this.Free = -1;
 		}
+		
+		public void CalcFreeLikelihood()
+		{
+			// no information yet? set the likelihood of a free parking space to 50%
+			if(this.Free < 0)
+            {
+                this.FreeLikelihood = 0.5;
+            }
+            
+            // if there are information on the current status of free parking spots,
+            // set the likelihood to the amount of free spots devided by the capacity
+            else
+            {
+                if(this.Type == ParkingType.Garage) 
+                {
+                    if(this.Free == 0) this.FreeLikelihood = 0.0;
+                    else if(this.Free == 1) this.FreeLikelihood = 0.05;
+                    else if(this.Free == 2) this.FreeLikelihood = 0.10;
+                    else if(this.Free == 3) this.FreeLikelihood = 0.15;
+              
+                    else this.FreeLikelihood = 1.0;
+                }
+            }
+		}
 	}
 	
 }
