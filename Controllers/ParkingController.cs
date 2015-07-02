@@ -375,7 +375,7 @@ namespace ParkEasyAPI.Controllers
             };
             
             update = new UpdateDocument {
-                { "$set", new BsonDocument("ReceivedVotes", true }
+                { "$set", new BsonDocument("ReceivedVotes", true) }
             };
             
             collectionParking.Update(query, update);
