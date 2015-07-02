@@ -34,7 +34,7 @@ namespace ParkEasyAPI.Controllers
                 geojson["type"] = "FeatureCollection";
                 geojson["features"] = new List<dynamic>();
        
-                foreach(ParkingModel parking in collectionParking.FindAll().SetFields(new string[]{"Name", "Free", "Coordinates", "Type", "Capacity"}))
+                foreach(ParkingModel parking in collectionParking.FindAll().SetFields(new string[]{"Name", "Free", "Coordinates", "Type", "Capacity", "FreeLikelihood"}))
                 {
                     parking.CalcFreeLikelihood();
                     
@@ -47,7 +47,7 @@ namespace ParkEasyAPI.Controllers
                     
                     feature["properties"] = new Dictionary<string, Object>();
                     feature["properties"]["title"] = parking.Name;
-                    feature["properties"]["description"] = parking.Capacity + " Plätze<br>Frei Wahrsch.: " + Math.Round(parking.FreeLikelihood*100) + "%";
+                    feature["properties"]["description"] = parking.Capacity + " Plätze<br>Frei Wahrsch.: " + parking.FreeLikelihood;
                     feature["properties"]["marker-size"] = "large";
                     
                     switch(parking.Type)
