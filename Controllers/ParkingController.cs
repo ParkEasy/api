@@ -34,7 +34,7 @@ namespace ParkEasyAPI.Controllers
                 geojson["type"] = "FeatureCollection";
                 geojson["features"] = new List<dynamic>();
        
-                foreach(ParkingModel parking in collectionParking.FindAll().SetFields(new string[]{"Name", "Free", "Coordinates", "Type", "Capacity", "FreeLikelihood"}))
+                foreach(ParkingModel parking in collectionParking.FindAll().SetFields(new string[]{"Name", "Free", "Coordinates", "Type", "Capacity", "FreeLikelihood", "ReceivedVotes"}))
                 {
                     parking.CalcFreeLikelihood();
                     
