@@ -369,6 +369,17 @@ namespace ParkEasyAPI.Controllers
             
             collectionParking.Update(query, update);
             
+            // update the parking document to for denormalization purposes
+            query = new QueryDocument {
+                { "_id", id }
+            };
+            
+            update = new UpdateDocument {
+                { "$set", new BsonDocument("ReceivedVotes", true }
+            };
+            
+            collectionParking.Update(query, update);
+            
             return true;
         }
     }

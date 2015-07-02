@@ -21,6 +21,7 @@ namespace ParkEasyAPI.Models
 		public string SectionTo;
 		public double DistanceToUser;
 		public bool Gates;
+		public bool ReceivedVotes;
 		public OpeningHoursModel[] OpeningHours;
 		
 		public  ParkingModel() {
@@ -28,12 +29,13 @@ namespace ParkEasyAPI.Models
 			this.Coordinates = new double[2];
 			this.FreeLikelihood = 0.0;
 			this.Free = -1;
+			this.ReceivedVotes = false;
 		}
 		
 		public void CalcFreeLikelihood()
 		{
 			// no information yet? set the likelihood of a free parking space to 50%
-			if(this.Free < 0)
+			if(this.Free < 0 && this.ReceivedVotes == false)
             {
                 this.FreeLikelihood = 0.5;
             }
